@@ -43,8 +43,9 @@
                             <page id="published_books" name="published_books" string="Publisher Of...">
                                 <group>
                                     <group>
-                                        <field name="publisher_of">
-                                            <list create="false" edit="false">
+                                        <field name="publisher_of" nolabel="1">
+                                            <!--FIXME make the following list view read only -->
+                                            <list create="False" edit="False">
                                                 <field name="name"/>
                                             </list>
                                         </field>
