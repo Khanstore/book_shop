@@ -1,0 +1,10 @@
+
+<templates id="template" xml:space="preserve">
+    <t t-name="pos_event.ProductCard" t-inherit="point_of_sale.ProductCard" t-inherit-mode="extension">
+        <xpath expr="//div[contains(concat(' ', @class, ' '), ' product-content ')]" position="after">
+    <div class="product-content d-flex flex-row px-2 justify-content-between rounded-bottom rounded-3 flex-shrink-1">
+        <t t-esc="props.price"/>
+    </div>
+</xpath>
+    </t>
+</templates>

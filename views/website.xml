@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="product" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='product_details']/h1" position="after">
+            <t t-if="product.is_book">
+                <t t-foreach="product.author_ids" t-as="author">
+                    <!--todo for the first record display "author:" and if not the last then show ","  -->
+                    <!--fixme set the public_category_id for the author_id-->
+                    <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
+                    <a  t-att-href="author_link"  t-field="author.name" />,
+                </t>
+                <t t-foreach="product.publisher_ids" t-as="publisher">
+                    <!--todo for the first record display "Publisher:" and if not the last then show ","  -->
+                    <!--fixme set the public_category_id for the publisher_id-->
+                    <t t-set="publisher_link" t-value="'/shop/category/'+str(publisher.id)"/>
+                    <a  t-att-href="publisher_link"  t-field="publisher.name" />,
+                </t>
+
+            </t>
+        </xpath>
+
+    </template>
+    <template id="products_item" inherit_id="website_sale.products_item">
+        <xpath expr="//div[@class='o_wsale_product_information_text']/h6" position="after">
+            <t t-if="product.is_book">
+                <h7>Author:</h7>
+                <t t-foreach="product.author_ids" t-as="author">
+                    <!--fixme set the public_category_id for the author_id-->
+                    <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
+                    <a  t-att-href="author_link"  t-field="author.name" />,
+                </t>
+            </t>
+        </xpath>
+
+
+
+    </template>
+
+</odoo>

@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+book_shop.access_product_genre,access_product_genre,book_shop.model_product_genre,base.group_user,1,0,0,0
+book_shop.access_paper_quality,access_paper_quality,book_shop.model_paper_quality,base.group_user,1,0,0,0
+book_shop.access_paper_type,access_paper_type,book_shop.model_paper_type,base.group_user,1,0,0,0
+book_shop.access_book_binding_type,access_book_binding_type,book_shop.model_book_binding_type,base.group_user,1,0,0,0

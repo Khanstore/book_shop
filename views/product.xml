@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<record id="product_template_only_book_form_view" model="ir.ui.view">
+            <field name="name">product.template.book.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <page name="general_information" position="after">
+                   <page name="book_details" string="Book Details" invisible="not is_book">
+                        <group>
+                            <group>
+                                <field name="author_ids" widget="many2many_tags" domain="[ ('is_writer', '=', 'True')]" context="{'default_is_writer':1}"/>
+                                <field name="genre" />
+                                <field name="publication_date" />
+                                <field name="last_edition" />
+                                <field name="binding_type" />
+                                <field name="total_page" />
+                                <field name="isbn" />
+                            </group>
+                            <group>
+                                <field name="publisher_ids" widget="many2many_tags" domain="[ ('is_publisher', '=', 'True')]" context="{'default_is_publisher':1}"/>
+                                <field name="is_book"/>
+                            </group>
+                        </group>
+                    </page>
+                </page>
+<!--                <field name="barcode" invisible="product_variant_count &gt; 1                         or (product_variant_count == 0                         and valid_product_template_attribute_line_ids)                         or type in ['service', 'combo']"/>-->
+            </field>
+        </record>
+
+    <record id="product_genre_form" model="ir.ui.view">
+        <field name="model">product.genre</field>
+        <field name="name">product.genre.form</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name"/>
+                    </group>
+                    <group>
+                        <field name="description"/>
+                    </group>
+                </group>
+            </form>
+        </field>
+    </record>
+</odoo>

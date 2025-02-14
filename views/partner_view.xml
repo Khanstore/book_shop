@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id ='partner_balance_button_view' model="ir.ui.view">
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="name">partner.balance.button.form</field>
+            <field name="model">res.partner</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button  type="object" class="oe_stat_button"  name="open_partner_ledger" icon="fa-list">
+                        <div class="o_field_widget o_stat_info">
+                            <span class="o_stat_value">
+                                <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible=" total_balance &gt; 0" class="text-danger"/>
+                                <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="total_balance == 0 or total_balance &lt; 0"/>
+                            </span>
+                            <span class="o_stat_text " invisible="total_balance == 0 or total_balance &lt; 0">Balance</span>
+                            <span class="o_stat_text text-danger" invisible=" total_balance &gt; 0">Balance</span>
+                        </div>
+                    </button>
+                </div>
+<!--                xpath index starts from 1 not 0-->
+                <xpath expr="//group[1]" position="before">
+                    <div>
+                           <div><field name="is_writer"/><label for="is_writer"/></div>
+                           <div><field name="is_publisher"/><label for="is_publisher"/></div>
+                    </div>
+                </xpath>
+                <xpath expr="//page[@name='contact_addresses']" position="after">
+                    <page name="related_book" string="Books">
+                        <notebook>
+                            <page id="written_books" name="written_books" string="Author Of...">
+                                <group>
+                                    <group>
+                                        <field name="author_of">
+                                            <list create="false" edit="false">
+                                                <field name="name"/>
+                                            </list>
+                                        </field>
+                                    </group>
+                                </group>
+                            </page>
+                            <page id="published_books" name="published_books" string="Publisher Of...">
+                                <group>
+                                    <group>
+                                        <field name="publisher_of">
+                                            <list create="false" edit="false">
+                                                <field name="name"/>
+                                            </list>
+                                        </field>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </page>
+                </xpath>
+            </field>
+
+        </record>
+
+
+
+
+    </data>
+</odoo>
