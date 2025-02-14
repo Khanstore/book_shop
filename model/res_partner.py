@@ -47,7 +47,11 @@ class Partner(models.Model):
             partner_balance = partner.debit - partner.credit
             partner.total_balance = partner_balance
 
-
+    @api.model
+    # def _rec_names_search(self, name, args=None, operator='ilike', limit=100):
+    #     args = args or []
+    #     domain = ['|', ('phone_search', operator, name), ('mobile_search', operator, name)]
+    #     return self.search(domain + args, limit=limit).name_get()
     @api.model
     def init(self):
         super(Partner, self).init()
@@ -57,9 +61,9 @@ class Partner(models.Model):
             self._rec_names_search.append("phone_search")
         if "mobile_search" not in self._rec_names_search:
             self._rec_names_search.append("mobile_search")
-
+    #
     @api.onchange('phone', 'mobile')
-    def sanitize_phone(self):
+    def prepare_phone4search(self):
         if self.phone:
             self.phone_search = self.phone.replace(" ", "").replace('-', "")
         if self.mobile:
