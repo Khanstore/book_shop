@@ -1,0 +1,4 @@
+id,name,parent_id/id,property_cost_method,removal_strategy_id/id
+book_shop.product_category_book,Book,product.product_category_all,Average Cost (AVCO),
+
+

@@ -1,0 +1,6 @@
+/* Ensure product images maintain aspect ratio */
+.pos .product-image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+}

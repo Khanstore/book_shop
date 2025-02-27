@@ -1,40 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
+    
+    <template id="report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@t-field='doc.partner_id']" position="after">
+            <t t-if="doc.partner_id.mobile">
+                <p>
+                    <span t-field="doc.partner_id.mobile"/>
+                </p>
+            </t>
+            <t t-elif="doc.partner_id.phone">
+                <p>
+                    <span t-field="doc.partner_id.phone"/>
+                </p>
+            </t>
+            <t t-elif="doc.partner_id.parent_id.mobile">
+                <p>
+                    (Rq) <span t-field="doc.partner_id.parent_id.mobile"/>
+                </p>
+            </t>
+            <t t-elif="doc.partner_id.parent_id.phone">
+                <p>
+                   (Rq) <span t-field="doc.partner_id.parent_id.phone"/>
+                </p>
+            </t>
+        </xpath>
+    </template>
     <template id="product" inherit_id="website_sale.product">
         <xpath expr="//div[@id='product_details']/h1" position="after">
             <t t-if="product.is_book">
+                <t t-foreach="product.sudo().author_ids" t-as="author">
+                    <t t-if="author_first"> By : </t>
+                    <!--fixme set the public_category_id for the author_id-->
+                    <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
+                    <a  t-att-href="author_link"   ><t t-esc="author.sudo().name"/></a>
+                    <t t-if=" not author_last">, </t>
+                </t><br/>
+                <t t-foreach="product.sudo().publisher_ids" t-as="publisher">
+                    <t t-if="publisher_first"> From : </t>
+                    <!--fixme set the public_category_id for the publisher_id-->
+                    <t t-set="publisher_link" t-value="'/shop/category/'+str(publisher.id)"/>
+                    <a  t-att-href="publisher_link"  t-field="publisher.name" />
+                    <t t-if=" not publisher_last">, </t>
+                </t>
+                <t t-if="product_variant.sudo().total_page and product_variant.sudo().total_page>0 ">
+                    <br/><t t-esc="product_variant.total_page"/> Page
+                    <t t-if="product.paper_type.id">
+                        ,(<t t-esc="product.paper_type.name"/>)
+                    </t>
+                </t>
+                    <t t-if="product_variant.sudo().binding_type.id">
+                    <br/><t t-esc="product_variant.sudo().binding_type.name"/> Binding
+                </t>
+                <t t-if="product.length and product.width and product.height">
+                    <t t-if="(product.length+product.width+product.height)>0">
+                        <br/>Size :<t t-esc="product.length" /> X <t t-esc="product.width"/>X <t t-esc="product.height"/>
+                    </t>
+                </t>
+
+
+            </t>
+        </xpath>
+       <!--<div class="js_product js_main_product mb-3" position="inside">
+           dsdss<t t-esc="product_variant.total_page"/>
+       </div>-->
+
+    </template>
+
+    <template id="products_item" inherit_id="website_sale.products_item">
+        <xpath expr="//div[@class='o_wsale_product_information_text']/h6" position="after">
+            <t t-if="product.is_book">
+                <h8>Author:</h8>
                 <t t-foreach="product.author_ids" t-as="author">
-                    <!--todo for the first record display "author:" and if not the last then show ","  -->
                     <!--fixme set the public_category_id for the author_id-->
                     <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
                     <a  t-att-href="author_link"  t-field="author.name" />,
-                </t>
+                </t><br/>
+                <h7>Publisher:</h7>
                 <t t-foreach="product.publisher_ids" t-as="publisher">
-                    <!--todo for the first record display "Publisher:" and if not the last then show ","  -->
                     <!--fixme set the public_category_id for the publisher_id-->
                     <t t-set="publisher_link" t-value="'/shop/category/'+str(publisher.id)"/>
                     <a  t-att-href="publisher_link"  t-field="publisher.name" />,
                 </t>
-
-            </t>
-        </xpath>
-
-    </template>
-    <template id="products_item" inherit_id="website_sale.products_item">
-        <xpath expr="//div[@class='o_wsale_product_information_text']/h6" position="after">
-            <t t-if="product.is_book">
-                <h7>Author:</h7>
-                <t t-foreach="product.author_ids" t-as="author">
-                    <!--fixme set the public_category_id for the author_id-->
-                    <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
-                    <a  t-att-href="author_link"  t-field="author.name" />,
-                </t>
             </t>
         </xpath>
 
 
 
     </template>
-
+    <template id="footer_custom_inherit" inherit_id="website.footer_custom">
+        <xpath expr="//div[@id='footer']//div[@class='col-lg-5 pt24 pb24']/p" position="replace">
+            <p>থান স্টোর একটি সনামধন্য ইউনিফর্ম সপ .
+            <br/><br/>Feel free to add more details about your products, services, and mission.</p>
+        </xpath>
+    </template>
 </odoo>

@@ -14,6 +14,7 @@
                                 <field name="publication_date" />
                                 <field name="last_edition" />
                                 <field name="binding_type" />
+                                <field name="paper_type" />
                                 <field name="total_page" />
                                 <field name="isbn" />
                             </group>

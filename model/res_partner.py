@@ -26,7 +26,7 @@ from odoo import fields, models, api, _
 
 class Partner(models.Model):
     _inherit = 'res.partner'
-    phone_search = fields.Char("Phone_search")
+    phone_search = fields.Char("Phone_search", compute='prepare_phone4search',store="True")
     mobile_search = fields.Char("mobile_search")
     is_writer = fields.Boolean("Is a Writer", default=False)
     is_publisher = fields.Boolean("Is a Publisher", default=False)
@@ -61,8 +61,12 @@ class Partner(models.Model):
             self._rec_names_search.append("phone_search")
         if "mobile_search" not in self._rec_names_search:
             self._rec_names_search.append("mobile_search")
+        if "phone" not in self._rec_names_search:
+            self._rec_names_search.append("phone")
+        if "mobile" not in self._rec_names_search:
+            self._rec_names_search.append("mobile")
     #
-    @api.onchange('phone', 'mobile')
+    @api.depends('phone', 'mobile')
     def prepare_phone4search(self):
         if self.phone:
             self.phone_search = self.phone.replace(" ", "").replace('-', "")
@@ -75,11 +79,14 @@ class Partner(models.Model):
         if self.is_writer:
             ecom_categ = self.env['product.public.category'].search([('related_writer_id', '=', self._origin.id)])
             if len(ecom_categ) == 0:
-                ecom_categ.create({'name': self.name, 'related_writer_id': self._origin.id})
+                parent=self.env['ir.model.data']._xmlid_to_res_id('book_shop.product_public_category_author', raise_if_not_found=False)
+                ecom_categ.create({'name': self.name,'parent_id':parent, 'related_writer_id': self._origin.id})
 
     @api.onchange("is_publisher")
     def create_related_ecommerce_category_publisher(self):
         if self.is_publisher:
             ecom_categ = self.env['product.public.category'].search([('related_publisher_id', '=', self._origin.id)])
             if len(ecom_categ) == 0:
-                ecom_categ.create({'name': self.name, 'related_publisher_id': self._origin.id})
+                parent = self.env['ir.model.data']._xmlid_to_res_id('book_shop.product_public_category_publication',
+                                                                    raise_if_not_found=False)
+                ecom_categ.create({'name': self.name,'parent_id':parent, 'related_publisher_id': self._origin.id})

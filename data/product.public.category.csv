@@ -1,0 +1,6 @@
+id,name,parent_id/id,website_description
+book_shop.product_public_category_book,Book,,All The Books are listed in this Category
+book_shop.product_public_category_author,Authors,book_shop.product_public_category_book,All The Authors are listed in this Category
+book_shop.product_public_category_publication,Publications,book_shop.product_public_category_book,All The Publications are listed in this Category
+
+

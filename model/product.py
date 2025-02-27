@@ -36,6 +36,7 @@ class ProductTemplate(models.Model):
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type=fields.Many2one("book.binding.type")
     total_page = fields.Integer("Page")
+    paper_type = fields.Many2one("paper.type")
     length=fields.Float("lenght")
     height=fields.Float("Height")
     width=fields.Float("Width")
@@ -47,7 +48,7 @@ class ProductTemplate(models.Model):
             rec.is_book = False
             while category:
                 # fixme correction of external id
-                if category.get_external_id()[category.id] == 'eagle_book_shop.product_category_books':
+                if category.get_external_id()[category.id] == 'book_shop.product_category_book':
                     rec.is_book = True
                     return
                 else:
@@ -91,6 +92,7 @@ class ProductProduct(models.Model):
     last_edition = fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type = fields.Many2one("book.binding.type")
+    paper_type = fields.Many2one("paper.type")
     total_page = fields.Integer("Page")
     length = fields.Float("lenght")
     height = fields.Float("Height")
@@ -110,18 +112,40 @@ class ProductPublicCategory(models.Model):
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
 
 class PaperQuality(models.Model):
-    _name = 'paper.quality'
-    _description = 'Quality Of Paper'
-    name = fields.Char("Paper Quality" , compute='get_name')
+    _name = 'paper.type'
+    _description = 'Type Of Paper'
+    name = fields.Char("Paper Type",compute='get_paper_name')
     gsm= fields.Integer("GSM")
-    paper_type=fields.Many2one ("paper.type","Paper Type")
-    color= fields.Char("colour")
+    paper_quality=fields.Many2one ("paper.quality","Paper quality")
+    paper_color= fields.Many2one("book.paper.color",string="colour")
+    description = fields.Char("description")
+
+    @api.onchange('gsm','paper_type','color')
+    def get_paper_name(self):
+        for rec in self:
+            paper=""
+            if rec.gsm:
+                paper=str(rec.gsm) + " gram "
+
+            if rec.paper_color :
+                paper=paper +rec.paper_color.name +" "
+            if rec.paper_quality :
+                paper=paper +rec.paper_quality.name +" "
+            if rec.description :
+                paper=paper +"("+ rec.description+")"
+            rec.name=paper
+
+
+class PaperColor(models.Model):
+    _name = 'book.paper.color'
+    _description = 'Color Of Paper'
+    name = fields.Char("Paper Color")
     description = fields.Char("description")
 
 class PaperType(models.Model):
-    _name = 'paper.type'
-    _description = 'Type Of Paper'
-    name = fields.Char("Paper Type")
+    _name = 'paper.quality'
+    _description = 'Quality Of Paper'
+    name = fields.Char("Paper Quality")
     description = fields.Char("description")
 
 class BookBindingType(models.Model):
