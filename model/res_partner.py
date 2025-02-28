@@ -21,8 +21,10 @@
 ###################################################################################
 import urllib
 import base64
-
+import logging
 from odoo import fields, models, api, _
+# Set up logging
+_logger = logging.getLogger(__name__)
 
 class Partner(models.Model):
     _inherit = 'res.partner'
@@ -47,31 +49,47 @@ class Partner(models.Model):
             partner_balance = partner.debit - partner.credit
             partner.total_balance = partner_balance
 
-    @api.model
+    # @api.model
     # def _rec_names_search(self, name, args=None, operator='ilike', limit=100):
     #     args = args or []
     #     domain = ['|', ('phone_search', operator, name), ('mobile_search', operator, name)]
     #     return self.search(domain + args, limit=limit).name_get()
-    @api.model
-    def init(self):
-        super(Partner, self).init()
 
-        # Dynamically add a field to _rec_names_search
-        if "phone_search" not in self._rec_names_search:
-            self._rec_names_search.append("phone_search")
-        if "mobile_search" not in self._rec_names_search:
-            self._rec_names_search.append("mobile_search")
-        if "phone" not in self._rec_names_search:
-            self._rec_names_search.append("phone")
-        if "mobile" not in self._rec_names_search:
-            self._rec_names_search.append("mobile")
+    # @api.model
+    # def add_phone_to_search(self):
+    #     searchables=self._rec_names_search
+    #     if not 'phone' in searchables:
+    #         self._rec_names_search.append('phone')
+    #         print ("phone is added to searchable")
+    @property
+    def _rec_names_search(self):
+        return super()._rec_names_search + ["phone_search", "mobile_search", "phone", "mobile"]
+    # @api.model
+    # def init(self):
+    #     super(Partner, self).init()
+    #     _logger.info("Initializing Partner model and adding fields to _rec_names_search")
     #
+    #     # Dynamically add fields to _rec_names_search
+    #     if "phone_search" not in self._rec_names_search:
+    #         self._rec_names_search.append("phone_search")
+    #         _logger.info("Added 'phone_search' to _rec_names_search")
+    #     if "mobile_search" not in self._rec_names_search:
+    #         self._rec_names_search.append("mobile_search")
+    #         _logger.info("Added 'mobile_search' to _rec_names_search")
+    #     if "phone" not in self._rec_names_search:
+    #         self._rec_names_search.append("phone")
+    #         _logger.info("Added 'phone' to _rec_names_search")
+    #     if "mobile" not in self._rec_names_search:
+    #         self._rec_names_search.append("mobile")
+    #         _logger.info("Added 'mobile' to _rec_names_search")
     @api.depends('phone', 'mobile')
     def prepare_phone4search(self):
-        if self.phone:
-            self.phone_search = self.phone.replace(" ", "").replace('-', "")
-        if self.mobile:
-            self.mobile_search = self.mobile.replace(" ", "").replace('-', "")
+        for rec in self:
+            if rec.phone:
+                rec.phone_search = rec.phone.replace(" ", "").replace('-', "")
+            if rec.mobile:
+                rec.mobile_search = rec.mobile.replace(" ", "").replace('-', "")
+
 
     @api.onchange("is_writer")
     def create_related_ecommerce_category_writer(self):
