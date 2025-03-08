@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+
+        <template id="report_simple_label_dymo" inherit_id="product.report_simple_label_dymo">
+            <span t-out="barcode" position="replace">
+                <t t-if="product.is_product_variant">
+                    <t t-set="pricelist" t-value="product.env['product.pricelist'].search([('id','=',1)])"/>
+
+                    <t t-set="last_purchase" t-value="(lambda product: product.env['purchase.order.line'].search([('product_id', '=', product.id)], order='date_order desc', limit=1).price_unit if product.env['purchase.order.line'].search([('product_id', '=', product.id)], order='date_order desc', limit=1) else 0.0)(product)"/>
+                    <span t-out="barcode" />
+                    (C)
+                    <t t-esc="env['myfunctions'].replace_digits_with_letters(str(product.standard_price))"/>
+                    (L)
+                    <t t-esc="env['myfunctions'].replace_digits_with_letters(str(last_purchase))"/>
+                    (P)
+                    <t t-esc="env['myfunctions'].replace_digits_with_letters(str(product._get_combination_info_variant()['price']))"/>
+
+
+                </t>
+                <t t-else="">
+                    <span t-out="barcode" />
+                </t>
+            </span>
+            <span t-field="product.display_name" position="attributes">
+                <attribute name="style">font-size:.7em</attribute>
+            </span>
+            <div class="text-end" position="replace">
+                <div class="text-end" style="padding: 0 4px;">
+                    <!--            FIXME pricelist id Here-->
+                    <t t-if="product.is_product_variant">
+                        <strong class="o_label_price_small" t-out="pricelist._get_product_price(product, 1, pricelist.currency_id or product.currency_id)"
+                                t-options="{'widget': 'monetary', 'display_currency': pricelist.currency_id or product.currency_id, 'label_price': True}"/>
+
+                    </t>
+                    <t t-else="">
+                        <strong class="o_label_price_small" t-field="product.list_price"
+                                t-options="{'widget': 'monetary', 'label_price': True}"/>
+                    </t>
+                    <div t-if="False" class="o_label_extra_data">
+                        <t t-out="extra_html"/>
+                    </div>
+                </div>
+            </div>
+
+        </template>
+
+    </data>
+</odoo>

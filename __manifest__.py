@@ -27,6 +27,7 @@ governements, etc.)
         'views/purchase_order.xml',
         'views/pos_product.xml',
         'views/website.xml',
+        'reports/product_product_templates.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',
