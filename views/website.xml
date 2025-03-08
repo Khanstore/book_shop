@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    
+<!--fIXME FOLLOWING TEMPLATE IS FOR SHOWING PARTNER MOBILE AND PHONE nO-->
     <template id="report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
         <xpath expr="//div[@t-field='doc.partner_id']" position="after">
             <t t-if="doc.partner_id.mobile">
@@ -25,6 +25,7 @@
             </t>
         </xpath>
     </template>
+
     <template id="product" inherit_id="website_sale.product">
         <xpath expr="//div[@id='product_details']/h1" position="after">
             <t t-if="product.is_book">
@@ -87,6 +88,7 @@
 
 
     </template>
+
     <template id="footer_custom_inherit" inherit_id="website.footer_custom">
         <xpath expr="//div[@id='footer']//div[@class='col-lg-5 pt24 pb24']/p" position="replace">
             <p>থান স্টোর একটি সনামধন্য ইউনিফর্ম সপ .
