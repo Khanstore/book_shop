@@ -79,6 +79,48 @@ class ProductTemplate(models.Model):
                 [('related_publisher_id', '=', line._origin.id)])
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
+    # @api.model
+    # def name_search(self, name, args=None, operator='ilike', limit=100):
+    #     args = args or []
+    #     domain = [('name', operator, name)]  # Default search in current language
+    #
+    #     # Fetch translations dynamically using Odoo’s `with_context` method
+    #     translated_product_ids = set()
+    #     active_langs = self.env['res.lang'].search([('active', '=', True)])
+    #
+    #     for lang in active_langs:
+    #         translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
+    #         translated_product_ids.update(translated_products.ids)
+    #
+    #     if translated_product_ids:
+    #         domain = ['|'] + domain + [('id', 'in', list(translated_product_ids))]
+    #
+    #     return self.search(domain + args, limit=limit).name_get()
+    @api.model
+    def name_search(self, name, args=None, operator='ilike', limit=100):
+        args = args or []
+        search_domain = [('name', operator, name)]  # Default search in the current language
+
+        # Get all active languages
+        active_langs = self.env['res.lang'].search([('active', '=', True)])
+        product_ids = set()
+
+        # Search product names in all active languages
+        for lang in active_langs:
+            translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
+            product_ids.update(translated_products.ids)
+
+        # Add translated product IDs to the search domain
+        if product_ids:
+            search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
+
+        # Search for products
+        products = self.search(search_domain + args, limit=limit)
+
+        # Return product names manually
+        return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
+
+
 class ProductProduct(models.Model):
     _inherit= 'product.product'
 
