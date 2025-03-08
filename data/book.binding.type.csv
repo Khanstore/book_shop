@@ -1,3 +1,5 @@
 id,name,description
 binding_type_hard_jack,Hard Cover Jacket,Hard cover Bining with dust cover
+binding_type_hard,Hard Cover,Hard cover Bining
+binding_type_hard_rexcin,Hard Cover (Rexcin),Hard cover Binding with Rexcin
 binding_type_paperback,Paper Back,Soft cover Binding
