@@ -19,12 +19,13 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ###################################################################################
-from . import res_partner
-from . import product
-from . import sale_order
-from . import purchase_order
-from . import ashraf
-from . import stock
-from . import account_move
+import urllib
+import base64
 
-# from . import website
+from odoo import fields, models, api, _
+
+class AccountMove(models.Model):
+    _inherit='account.move'
+
+
+    partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
