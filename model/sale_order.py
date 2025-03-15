@@ -27,4 +27,20 @@ from odoo import fields, models, api, _
 class SaleOrder(models.Model):
     _inherit='sale.order'
 
-    partner_balance=fields.Monetary("Partner Balance",related="partner_id.total_balance")
+    partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
+
+    def action_complete_invoice_delivery(self):
+        self.action_confirm()
+        self.picking_ids.button_validate()
+        invoice = self._create_invoices()
+        invoice.action_post()
+
+
+                # picking.action_confirm()
+                # picking.action_assign()
+                # picking.button_validate()
+
+            # Create the invoice
+
+
+        print("Delivery done and invoice created")

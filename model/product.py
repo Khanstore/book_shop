@@ -202,3 +202,6 @@ class ProductPublicCategory(models.Model):
     _description='this modules adds product public categories for writer and publishers'
     related_writer_id=fields.Many2one('res.partner',"Writer")
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
+
+
+

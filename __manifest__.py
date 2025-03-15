@@ -27,7 +27,10 @@ governements, etc.)
         'views/purchase_order.xml',
         'views/pos_product.xml',
         'views/website.xml',
+        'views/stock_picking.xml',
+        'views/invoice.xml',
         'reports/product_product_templates.xml',
+        'reports/invoice.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',
@@ -35,5 +38,8 @@ governements, etc.)
         'point_of_sale._assets_pos': [
             'book_shop/static/src/**/*',
             ],
+        'website.assets_frontend': [
+            'book_shop/static/src/js/product_configurator.js',  # Include your JS file here
+        ],
         },
     }

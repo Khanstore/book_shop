@@ -27,4 +27,4 @@ from odoo import fields, models, api, _
 class purchaseOrder(models.Model):
     _inherit='purchase.order'
 
-    partner_balance=fields.Monetary("Partner Balance",related="partner_id.total_balance")
+    partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")

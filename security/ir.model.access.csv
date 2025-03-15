@@ -6,3 +6,7 @@ book_shop.access_paper_type,access_paper_type,book_shop.model_paper_type,base.gr
 book_shop.access_paper_type_pubic,access_paper_type_public,book_shop.model_paper_type,base.group_public,1,0,0,0
 book_shop.access_book_binding_type,access_book_binding_type,book_shop.model_book_binding_type,base.group_user,1,0,0,0
 book_shop.access_book_paper_color,access_book_paper_color,book_shop.model_book_paper_color,base.group_user,1,0,0,0
+book_shop.access_myfunctions,access_myfunctions,book_shop.model_myfunctions,base.group_public,1,1,1,0
+book_shop.access_myfunctions,access_myfunctions,book_shop.model_myfunctions,base.group_user,1,1,1,0
+book_shop.access_picking_confirmation_wizard,access_picking_confirmation_wizard,book_shop.model_picking_confirmation_wizard,base.group_public,1,1,1,0
+book_shop.access_picking_confirmation_wizard,access_picking_confirmation_wizard,book_shop.model_picking_confirmation_wizard,base.group_user,1,1,1,0

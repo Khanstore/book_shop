@@ -43,6 +43,12 @@
                     <a  t-att-href="publisher_link"  t-field="publisher.name" />
                     <t t-if=" not publisher_last">, </t>
                 </t>
+                <div class="publication_date">
+                    <t t-if="product.product_variant_id.publication_date">
+                        <p>Custom Field: <span t-esc="product.product_variant_id.publication_date"/></p>
+                    </t>
+                </div>
+
                 <t t-if="product_variant.sudo().total_page and product_variant.sudo().total_page>0 ">
                     <br/><t t-esc="product_variant.total_page"/> Page
                     <t t-if="product.paper_type.id">
@@ -91,7 +97,7 @@
 
     <template id="footer_custom_inherit" inherit_id="website.footer_custom">
         <xpath expr="//div[@id='footer']//div[@class='col-lg-5 pt24 pb24']/p" position="replace">
-            <p>থান স্টোর একটি সনামধন্য ইউনিফর্ম সপ .
+            <p>খাঁন স্টোর একটি সনামধন্য ইউনিফর্ম সামগ্রী প্রস্তুত, বিক্রয় ও সর্বরাহকারী প্রতিষ্ঠান।
             <br/><br/>Feel free to add more details about your products, services, and mission.</p>
         </xpath>
     </template>
