@@ -19,17 +19,5 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ###################################################################################
-import urllib
-import base64
 
-from odoo import fields, models, api, _
-
-class AccountMove(models.Model):
-    _inherit='account.move'
-
-
-    partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
-    condition_txt=fields.Char("condition Text" ,compute='condition_payment_text')
-    def condition_payment_text(self):
-        self.condition_txt= "its condition text"
-
+from . import wizards

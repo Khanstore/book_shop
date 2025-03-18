@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <template id="daily_admin_report">
+    <t t-call="web.html_container">
+        <t t-call="web.internal_layout">
+            <div class="page">
+                <h3 class="mb32">Daily Report</h3>
+                <h5>from <t t-esc="docs.date_start"/> to <t t-esc="date_end"/> </h5>
+                <h4>Sales</h4>
+
+                <t t-foreach="docs.sales_new" t-as="sale">
+                    <div class="row">
+                        <div class="col">
+                            <t t-esc="sale.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="sale.partner_id.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="sale.state"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="sale.amount_total"/>
+                        </div>
+                    </div>
+
+                </t>
+                <h4>Purchases</h4>
+
+                <t t-foreach="docs.purchase_new" t-as="purchase">
+                    <div class="row">
+                        <div class="col">
+                            <t t-esc="purchase.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="purchase.partner_id.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="purchase.state"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="purchase.amount_total"/>
+                        </div>
+                    </div>
+
+                </t>
+                <h4>payments</h4>
+                <div class="row">
+                    <div class="col">Name</div>
+                    <div class="col">Partner</div>
+                    <div class="col">State</div>
+                    <div class="col">Journal</div>
+                    <div class="col">Reference</div>
+                    <div class="col">memo</div>
+                    <div class="col">Credit</div>
+                    <div class="col">debit</div>
+                </div>
+                <t t-foreach="docs.payment_new" t-as="payment">
+                    <div class="row">
+                        <div class="col">
+                            <t t-esc="payment.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.partner_id.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.state"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.journal_id.name"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.memo"/>
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.payment_reference"/>
+                        </div>
+                    <t t-if="payment.payment_type=='inbound'">
+                        <div class="col">
+                                <t t-esc="payment.amount"/>
+                        </div>
+                        <div class="col">
+                                0.00
+                        </div>
+                    </t>
+                    <t t-else="">
+                         <div class="col">
+                               0.00
+                        </div>
+                        <div class="col">
+                            <t t-esc="payment.amount"/>
+                        </div>
+                    </t>
+                    </div>
+
+                </t>
+            </div>
+        </t>
+    </t>
+        </template>
+        <record id="report_daily_admin_report" model="ir.actions.report">
+            <field name="name">Daily Admin Report</field>
+            <field name="model">book.shop.daily.statement</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">book_shop.daily_admin_report</field>
+            <field name="report_file">book_shop.daily_admin_report</field>
+            <field name="binding_model_id" ref="model_book_shop_daily_statement"/>
+<!--            <field name="paperformat_id" ref="product.paperformat_label_sheet_dymo"/>-->
+            <field name="print_report_name">'Daily Report - %s' % (object.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

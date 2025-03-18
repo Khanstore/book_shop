@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="daily_admin_report_view" model="ir.ui.view">
+            <field name="name">book.shop.daily.statement.view</field>
+            <field name="model">book.shop.daily.statement</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <group>
+                            <field name="date_start"/>
+                        </group>
+
+                        <group>
+                            <field name="date_end"/>
+                        </group>
+                        <field name="sales_new">
+                            <list>
+                                <field name="name"/>
+                            </list>
+                        </field>
+                        <field name="purchase_new">
+                            <list>
+                                <field name="name"/>
+                            </list>
+                        </field>
+                        <field name="payment_new">
+                            <list>
+                                <field name="name"/>
+                            </list>
+                        </field>
+                        <button name="update_fields" string="Update" type="object"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+    </data>
+</odoo>

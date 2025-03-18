@@ -32,6 +32,8 @@ governements, etc.)
         'reports/product_product_templates.xml',
         'reports/invoice.xml',
         'data/book_shop_pages.xml',
+        'wizard/wiard_views.xml',
+        'reports/daily_admin_report.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',
