@@ -31,6 +31,7 @@ governements, etc.)
         'views/invoice.xml',
         'reports/product_product_templates.xml',
         'reports/invoice.xml',
+        'data/book_shop_pages.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',

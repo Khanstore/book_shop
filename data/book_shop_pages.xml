@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Template for Book page -->
+    <template id="book_shop" name="Books">
+        <t t-call="website.layout">
+            <div id="wrap">
+                <div class="container">
+                    <div class="row o_grid_mode" data-row-count="10">
+                        <div class="o_grid_item g-col-lg-4 g-height-10 col-lg-4 o_colored_level" data-name="Box"
+                             style="z-index: 1; grid-area: 1 / 1 / 11 / 5;">
+                            <h1 class="display-3">
+                                <span style="font-size: 1.125rem;">পুলিশ বাহিনীর প্রয়োজনীয় ttt সমুহ</span>&amp;nbsp;
+                                <br/>
+                            </h1>
+                            <ul class="lead">
+                                    <t t-set="categories" t-value="('a','b','c','d','f')"/>
+                                <t t-foreach="categories" t-as="cat">
+                                   <li>
+                                    <a t-att-href="'/books/category/' + cat"><t t-esc="cat"/>dkjk</a>
+                                </li>
+                                </t>
+                                <li>
+                                    <a href="/shop/category/book-guaide-promotion-guide-61">গাইড</a>
+                                </li>
+                                <li>
+                                    <a href="/shop/category/book-police-hand-book-4">হ্যান্ডবুক</a>
+                                </li>
+                                <li>
+                                    <a href="/shop/category/57">দন্ডবিধি</a>
+                                </li>
+                                <li>
+                                    <a href="/shop/category/58">ফৌজদারি কার্যবিধি</a>
+                                </li>
+                                <li>
+                                    <a href="/shop/category/59">সাক্ষ আইন</a>
+                                </li>
+                                <li>
+                                    <a href="/shop/category/book-minor-acts-101">মাইনর এ্যক্টস&amp;nbsp;</a>
+                                    <br/>
+                                </li>
+                            </ul>
+                            <p>
+                                <a class="btn btn-lg btn-primary" href="/contactus">
+                                    Come Visit Us
+                                    <i class="fa fa-angle-right"/>
+                                </a>
+                            </p>
+                        </div>
+                        <div class="o_grid_item o_grid_item_image d-lg-block d-none o_snippet_mobile_invisible o_colored_level g-height-6 g-col-lg-5 col-lg-5 o_anim_fade_in o_animate o_visible"
+                             style="z-index: 2; grid-area: 1 / 7 / 7 / 12;" data-invisible="1">
+                            <a href="https://www.khan-store.com/shop/category/1">
+                                <img src="/web/image/21047-9a83e45f/book%20shelf.webp" alt=""
+                                     class="img img-fluid mx-auto o_we_custom_image rounded" data-mimetype="image/webp"
+                                     data-original-id="21046"
+                                     data-original-src="/web/image/21046-ad197d67/book%20shelf.jpg"
+                                     data-mimetype-before-conversion="image/jpeg" data-resize-width="NaN"
+                                     loading="eager"/>
+                            </a>
+                        </div>
+                        <div class="o_grid_item o_grid_item_image g-col-lg-2 g-height-5 col-lg-2 d-lg-block d-none o_snippet_mobile_invisible o_colored_level"
+                             style="z-index: 3; grid-area: 2 / 11 / 7 / 13;" data-invisible="1">
+                            <a href="/shop/category/book-guaide-promotion-guide-inspectorship-95">
+                                <img src="/web/image/21062-7e517dd4/inspectorship_guide_rakhal.webp" alt=""
+                                     class="img img-fluid mx-auto rounded o_we_custom_image" data-mimetype="image/webp"
+                                     data-original-id="21048"
+                                     data-original-src="/web/image/21048-347ea583/inspectorship_guide_rakhal.png"
+                                     data-mimetype-before-conversion="image/png" data-resize-width="NaN"
+                                     loading="lazy"/>
+                            </a>
+                        </div>
+                        <div class="o_grid_item g-col-lg-5 g-height-4 col-lg-5 o_colored_level"
+                             style="z-index: 4; grid-area: 6 / 6 / 10 / 11;">
+                            <blockquote
+                                    class="s_blockquote s_blockquote_with_line o_cc o_cc1 o_animable position-relative d-flex flex-column gap-4 w-100 mx-auto p-4 fst-normal shadow"
+                                    data-vcss="001" data-snippet="s_blockquote" data-name="Blockquote">
+                                <div class="s_blockquote_line_elt position-absolute top-0 start-0 bottom-0 bg-o-color-1"/>
+                                <div class="s_blockquote_wrap_icon position-absolute top-0 start-50 translate-middle w-100">
+                                    <i class="s_blockquote_icon fa fa-quote-right d-block mx-auto rounded bg-o-color-1"
+                                       role="img"/>
+                                </div>
+                                <p class="s_blockquote_quote my-auto">
+                                    "This bookstore is a delightful escape. Each visit reveals new stories waiting to be
+                                    discovered!"
+                                </p>
+                                <div class="s_blockquote_infos d-flex gap-2 flex-row align-items-start justify-content-start w-100 text-start">
+                                    <img src="/web/image/website.s_blockquote_default_image"
+                                         class="s_blockquote_avatar img rounded-circle" alt="" loading="lazy"/>
+                                    <div class="s_blockquote_author">
+                                        <span class="o_small">
+                                            <strong>James Thompson</strong>
+                                            <br/>
+                                            Mystery Lover
+                                        </span>
+                                    </div>
+                                </div>
+                            </blockquote>
+                        </div>
+                    </div>
+                </div>
+                <div class="oe_structure">
+                    <section class="s_title parallax s_parallax_is_fixed bg-black-50 pt24 pb24" data-vcss="001"
+                             data-snippet="s_title" data-scroll-background-ratio="1">
+                        <span class="s_parallax_bg oe_img_bg"
+                              style="background-image: url('/web/image/website.s_parallax_default_image'); background-position: 50% 0;"/>
+                        <div class="o_we_bg_filter bg-black-50"/>
+                        <div class="container">
+                            <h1>Services</h1>
+                        </div>
+                    </section>
+                </div>
+                <div class="oe_structure"/>
+            </div>
+        </t>
+    </template>
+
+</odoo>

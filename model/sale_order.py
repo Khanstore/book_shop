@@ -29,18 +29,20 @@ class SaleOrder(models.Model):
 
     partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
 
+    def test(self,data):
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'account.move',
+            'res_id': data['invoice_id'],
+            'view_mode': 'form',
+            'target': 'current',
+        }
     def action_complete_invoice_delivery(self):
         self.action_confirm()
         self.picking_ids.button_validate()
         invoice = self._create_invoices()
         invoice.action_post()
+        self.test({'invoice_id':invoice.id})
+        print ("yes")
+        # Open the invoice record (example: returning its form view in Odoo)
 
-
-                # picking.action_confirm()
-                # picking.action_assign()
-                # picking.button_validate()
-
-            # Create the invoice
-
-
-        print("Delivery done and invoice created")
