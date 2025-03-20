@@ -33,7 +33,7 @@ class DailyStatementWizard(models.TransientModel):
     date_end =fields.Date("end")
     mode=fields.Selection(string='Report mode',
         selection=[('short', 'Short'), ('long', 'Long')],
-        deault="short")
+        default="short")
     sales_new =fields.Many2many(comodel_name='sale.order' ,string='sales' ,compute='get_sales_new')
     purchase_new =fields.Many2many(comodel_name='purchase.order' ,string='Purchase' ,compute='get_purchase_new')
     payment_new =fields.Many2many(comodel_name='account.payment' ,string='Payments' ,compute='get_payment_new')
