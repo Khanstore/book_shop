@@ -43,7 +43,7 @@ governements, etc.)
             'book_shop/static/src/**/*',
             ],
         'website.assets_frontend': [
-            'book_shop/static/src/js/product_configurator.js',  # Include your JS file here
+            # 'book_shop/static/src/js/product_configurator.js',  # Include your JS file here
         ],
         },
     }
