@@ -31,6 +31,9 @@ class DailyStatementWizard(models.TransientModel):
     name =fields.Char("Daily Administrative Statement")
     date_start =fields.Date("Start",default=fields.Date.today)
     date_end =fields.Date("end")
+    mode=fields.Selection(string='Report mode',
+        selection=[('short', 'Short'), ('long', 'Long')],
+        deault="short")
     sales_new =fields.Many2many(comodel_name='sale.order' ,string='sales' ,compute='get_sales_new')
     purchase_new =fields.Many2many(comodel_name='purchase.order' ,string='Purchase' ,compute='get_purchase_new')
     payment_new =fields.Many2many(comodel_name='account.payment' ,string='Payments' ,compute='get_payment_new')

@@ -8,7 +8,12 @@
                 <h3 class="mb32">Daily Report</h3>
                 <h5>from <t t-esc="docs.date_start"/> to <t t-esc="date_end"/> </h5>
                 <h4>Sales</h4>
-
+                <div class="row">
+                        <div class="col">Order No</div>
+                        <div class="col">Partner</div>
+                        <div class="col">State</div>
+                        <div class="col">amount</div>
+                    </div>
                 <t t-foreach="docs.sales_new" t-as="sale">
                     <div class="row">
                         <div class="col">
@@ -16,6 +21,7 @@
                         </div>
                         <div class="col">
                             <t t-esc="sale.partner_id.name"/>
+                            (<t t-esc="sale.partner_id.total_balance"/>)
                         </div>
                         <div class="col">
                             <t t-esc="sale.state"/>
@@ -24,7 +30,26 @@
                             <t t-esc="sale.amount_total"/>
                         </div>
                     </div>
-
+                    <t t-if="docs.mode=='long'">
+                        <div class="row">
+                                <div class="col"></div>
+                                <div class="col">Product</div>
+                                <div class="col">Qty </div>
+                                <div class="col">Rate</div>
+                                <div class="col">tax </div>
+                                <div class="col">Total</div>
+                            </div>
+                        <t t-foreach="sale.order_line" t-as="line">
+                            <div class="row">
+                                <div class="col"></div>
+                                <div class="col"><t  t-esc="line.product_id.name"/> </div>
+                                <div class="col"><t  t-esc="line.product_uom_qty"/><t  t-esc="line.product_uom.name"/> </div>
+                                <div class="col"><t  t-esc="line.price_unit"/> </div>
+                                <div class="col"><t  t-esc="line.price_tax"/> </div>
+                                <div class="col"><t  t-esc="line.price_total"/> </div>
+                            </div>
+                        </t>
+                    </t>
                 </t>
                 <h4>Purchases</h4>
 
@@ -35,6 +60,7 @@
                         </div>
                         <div class="col">
                             <t t-esc="purchase.partner_id.name"/>
+                            (<t t-esc="purchase.partner_id.total_balance"/>)
                         </div>
                         <div class="col">
                             <t t-esc="purchase.state"/>
@@ -43,7 +69,26 @@
                             <t t-esc="purchase.amount_total"/>
                         </div>
                     </div>
-
+                    <t t-if="docs.mode=='long'">
+                        <div class="row">
+                                <div class="col"></div>
+                                <div class="col">Product</div>
+                                <div class="col">Qty </div>
+                                <div class="col">Rate</div>
+                                <div class="col">tax </div>
+                                <div class="col">Total</div>
+                            </div>
+                        <t t-foreach="purchase.order_line" t-as="line">
+                            <div class="row">
+                                <div class="col"></div>
+                                <div class="col"><t  t-esc="line.product_id.name"/> </div>
+                                <div class="col"><t  t-esc="line.product_uom_qty"/><t  t-esc="line.product_uom.name"/> </div>
+                                <div class="col"><t  t-esc="line.price_unit"/> </div>
+                                <div class="col"><t  t-esc="line.price_tax"/> </div>
+                                <div class="col"><t  t-esc="line.price_total"/> </div>
+                            </div>
+                        </t>
+                    </t>
                 </t>
                 <h4>payments</h4>
                 <div class="row">
@@ -52,9 +97,9 @@
                     <div class="col">State</div>
                     <div class="col">Journal</div>
                     <div class="col">Reference</div>
-                    <div class="col">memo</div>
+                    <div class="col">Memo</div>
                     <div class="col">Credit</div>
-                    <div class="col">debit</div>
+                    <div class="col">Debit</div>
                 </div>
                 <t t-foreach="docs.payment_new" t-as="payment">
                     <div class="row">
@@ -63,6 +108,7 @@
                         </div>
                         <div class="col">
                             <t t-esc="payment.partner_id.name"/>
+                            (<t t-esc="payment.partner_id.total_balance"/>)
                         </div>
                         <div class="col">
                             <t t-esc="payment.state"/>

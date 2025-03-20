@@ -9,6 +9,7 @@
                     <group>
                         <group>
                             <field name="date_start"/>
+                            <field name="mode"/>
                         </group>
 
                         <group>
@@ -35,5 +36,16 @@
             </field>
         </record>
 
+
+
     </data>
+    <record id="action_daily_admin_report" model="ir.actions.act_window">
+            <fiel name="name">action.daily.admin</fiel>
+            <field name="res_model">book.shop.daily.statement</field>
+        <field name="view_id" ref="daily_admin_report_view"/>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+<!--        <field name="context">{'module' : 'crm', 'bin_size': False}</field>-->
+
+        </record>
 </odoo>
