@@ -12,7 +12,7 @@ governements, etc.)
     """,
     'version': '18.0.1.0.0',
     'category': 'Others',
-    'depends' : ['website_sale','website','base','product','accountant','purchase','point_of_sale'],
+    'depends' : ['website_sale','website','base','product','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',
     'application': False,
     'data': [

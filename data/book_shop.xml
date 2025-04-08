@@ -12,20 +12,20 @@
         <field name="name">Of-White </field>
         <field name="description">Of-White Color</field>
     </record>
-    <record id="paper_type_white_offset_80" model="paper.type">
-        <field name="gsm">80</field>
-        <field name="paper_quality" ref="paper_quality_offset"/>
-        <field name="paper_color" ref="paper_color_white"/>
-    </record>
-    <record id="paper_type_white_offset_60" model="paper.type">
-        <field name="gsm">60</field>
-        <field name="paper_quality" ref="paper_quality_offset"/>
-        <field name="paper_color" ref="paper_color_white"/>
-    </record>
-    <record id="paper_type_of_white_offset_80" model="paper.type">
-        <field name="gsm">80</field>
-        <field name="paper_quality" ref="paper_quality_offset"/>
-        <field name="paper_color" ref="paper_color_of_white"/>
-    </record>
+<!--    <record id="paper_type_white_offset_80" model="paper.type">-->
+<!--        <field name="gsm">80</field>-->
+<!--        <field name="paper_quality" ref="paper_quality_offset"/>-->
+<!--        <field name="paper_color" ref="paper_color_white"/>-->
+<!--    </record>-->
+<!--    <record id="paper_type_white_offset_60" model="paper.type">-->
+<!--        <field name="gsm">60</field>-->
+<!--        <field name="paper_quality" ref="paper_quality_offset"/>-->
+<!--        <field name="paper_color" ref="paper_color_white"/>-->
+<!--    </record>-->
+<!--    <record id="paper_type_of_white_offset_80" model="paper.type">-->
+<!--        <field name="gsm">80</field>-->
+<!--        <field name="paper_quality" ref="paper_quality_offset"/>-->
+<!--        <field name="paper_color" ref="paper_color_of_white"/>-->
+<!--    </record>-->
 
 </odoo>

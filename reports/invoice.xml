@@ -1,23 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <template id="report_invoice_document" inherit_id="account.report_invoice_document">
-            <div name="address_not_same_as_shipping" position="replace">
-                <div class="col-6" name="address_not_same_as_shipping" position="replace">
-                            <t t-set="address">
-                                <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "mobile","phone","name"], "no_marker": False}'/>
-                                <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
-                                    <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
-                                    <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>
-                                </div>
-                            </t>
-                        </div>
-            </div>
-            <span id="payment_terms_note_id" position="before">
-                <p name="test">
-                    <t t-esc="o.condition_txt"/>
-                </p>
-            </span>
+        <template id="report_invoice_document" inherit_id="account.report_invoice_document" primary="True">
+            <xpath expr="//div[@t-field='o.partner_shipping_id']" position="replace">
+                <div t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address","phone","mobile" ,"name"], "no_marker": False}'/>
+                <div t-field="o.partner_shipping_id" t-options='{"widget": "contact", "fields": ["address","phone","mobile" ,"name"], "no_marker": False}'/>
+
+            </xpath>
+
+            <!--<xpath expr="//div[@name='address_not_same_as_shipping']//span[@t-field='o.partner_id.vat']"
+                   position="after">
+                <span t-esc="o.partner_id.l10n_th_branch_name"/>
+            </xpath>
+
+            <xpath expr="//div[@name='address_same_as_shipping']//span[@t-field='o.partner_id.vat']" position="after">
+                <span t-esc="o.partner_id.l10n_th_branch_name"/>
+            </xpath>
+            <xpath expr="//div[@name='no_shipping']//span[@t-field='o.partner_id.vat']" position="after">
+                <span t-esc="o.partner_id.l10n_th_branch_name"/>
+            </xpath>
+            <xpath expr="//t[@t-set='layout_document_title']/span[contains(@t-if, 'posted')]" position="replace">
+                <t t-if="o.move_type == 'out_invoice' and o.state == 'posted'">
+                    <span t-if="o.company_id.account_fiscal_country_id.code == 'TH' and not commercial_invoice">Tax
+                        Invoice
+                    </span>
+                    <span t-else="">Invoice</span>
+                </t>
+            </xpath>-->
         </template>
+
+        <!--
+                <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+                    <div name="address_not_same_as_shipping" position="replace">
+                        <div class="col-6" name="address_not_same_as_shipping" position="replace">
+                                    <t t-set="address">
+                                        <address class="mb-0" t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "mobile","phone","name"], "no_marker": False}'/>
+                                        <div t-if="o.partner_id.vat" id="partner_vat_address_not_same_as_shipping">
+                                            <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-out="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                            <t t-else="">Tax ID</t>: <span t-field="o.partner_id.vat"/>ashraf
+                                        </div>
+                                    </t>
+                                </div>
+                    </div>
+                    <span id="payment_terms_note_id" position="before">
+                        <p name="test">
+                            <t t-esc="o.condition_txt"/>
+                        </p>
+                    </span>
+                </template>
+        -->
     </data>
 </odoo>

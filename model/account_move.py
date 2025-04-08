@@ -27,9 +27,34 @@ from odoo import fields, models, api, _
 class AccountMove(models.Model):
     _inherit='account.move'
 
-
+    shipping_address=fields.Char("Shipping Address")
     partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
     condition_txt=fields.Char("condition Text" ,compute='condition_payment_text')
+
+    @api.onchange('partner_shipping_id')
+    def update_shipping_address(self):
+        shipping=self.partner_shipping_id
+        address=shipping.name
+        if shipping.parent_id:
+            adress=address + chr(10) +shipping.parent_id.name
+        if shipping.street:
+            address=address+ chr(10) +shipping.street +", "
+        if shipping.street2:
+            address=address+ shipping.street2 +", "
+        if shipping.city:
+            address = address + shipping.city + ", "
+
+        if shipping.state_id:
+            address = address + shipping.state_id.name
+        if shipping.zip:
+            address = address + shipping.zip
+        if shipping.phone:
+            address = address +chr(10)+ shipping.phone
+        if shipping.mobile:
+            address = address +chr(10)+ shipping.mobile
+
+        self.shipping_address=address
+
     def condition_payment_text(self):
         self.condition_txt= "its condition text"
 

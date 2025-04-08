@@ -108,3 +108,11 @@ class Partner(models.Model):
                 parent = self.env['ir.model.data']._xmlid_to_res_id('book_shop.product_public_category_publication',
                                                                     raise_if_not_found=False)
                 ecom_categ.create({'name': self.name,'parent_id':parent, 'related_publisher_id': self._origin.id})
+    def get_author_ecom_category(self):
+        ecom_categ = self.env['product.public.category'].search([('related_writer_id', '=', self._origin.id)])
+        return ecom_categ
+
+    def get_publisher_ecom_category(self):
+        ecom_categ = self.env['product.public.category'].search([('related_publisher_id', '=', self._origin.id)])
+        return ecom_categ
+

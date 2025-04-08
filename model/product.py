@@ -36,7 +36,9 @@ class ProductTemplate(models.Model):
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type=fields.Many2one("book.binding.type")
     total_page = fields.Integer("Page")
-    paper_type = fields.Many2one("paper.type")
+    paper_gsm = fields.Integer("GSM")
+    paper_color = fields.Many2one("book.paper.color", string="Colour")
+    paper_quality = fields.Many2one("paper.quality", string="Paper Quality")
     length=fields.Float("lenght")
     height=fields.Float("Height")
     width=fields.Float("Width")
@@ -134,7 +136,6 @@ class ProductProduct(models.Model):
     last_edition = fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type = fields.Many2one("book.binding.type")
-    paper_type = fields.Many2one("paper.type")
     total_page = fields.Integer("Page")
     length = fields.Float("lenght")
     height = fields.Float("Height")
@@ -153,30 +154,30 @@ class ProductPublicCategory(models.Model):
     related_writer_id=fields.Many2one('res.partner',"Writer")
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
 
-class PaperQuality(models.Model):
-    _name = 'paper.type'
-    _description = 'Type Of Paper'
-    name = fields.Char("Paper Type",compute='get_paper_name')
-    gsm= fields.Integer("GSM")
-    paper_quality=fields.Many2one ("paper.quality","Paper quality")
-    paper_color= fields.Many2one("book.paper.color",string="colour")
-    description = fields.Char("description")
-
-    @api.onchange('gsm','paper_type','color')
-    def get_paper_name(self):
-        for rec in self:
-            paper=""
-            if rec.gsm:
-                paper=str(rec.gsm) + " gram "
-
-            if rec.paper_color :
-                paper=paper +rec.paper_color.name +" "
-            if rec.paper_quality :
-                paper=paper +rec.paper_quality.name +" "
-            if rec.description :
-                paper=paper +"("+ rec.description+")"
-            rec.name=paper
-
+# class PaperQuality(models.Model):
+#     _name = 'paper.type'
+#     _description = 'Type Of Paper'
+#     name = fields.Char("Paper Type",compute='get_paper_name')
+#     gsm= fields.Integer("GSM")
+#     paper_quality=fields.Many2one ("paper.quality","Paper quality")
+#     paper_color= fields.Many2one("book.paper.color",string="colour")
+#     description = fields.Char("description")
+#
+#     @api.onchange('gsm','paper_type','color')
+#     def get_paper_name(self):
+#         for rec in self:
+#             paper=""
+#             if rec.gsm:
+#                 paper=str(rec.gsm) + " gram "
+#
+#             if rec.paper_color :
+#                 paper=paper +rec.paper_color.name +" "
+#             if rec.paper_quality :
+#                 paper=paper +rec.paper_quality.name +" "
+#             if rec.description :
+#                 paper=paper +"("+ rec.description+")"
+#             rec.name=paper
+#
 
 class PaperColor(models.Model):
     _name = 'book.paper.color'

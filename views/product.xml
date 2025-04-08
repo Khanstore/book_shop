@@ -11,20 +11,35 @@
                             <group>
                                 <field name="author_ids" widget="many2many_tags" domain="[ ('is_writer', '=', 'True')]" context="{'default_is_writer':1}"/>
                                 <field name="genre" />
-                                <field name="publication_date" />
-                                <field name="last_edition" />
-                                <field name="binding_type" />
-                                <field name="paper_type" />
-                                <field name="total_page" />
-                                <field name="isbn" />
+
                             </group>
                             <group>
                                 <field name="publisher_ids" widget="many2many_tags" domain="[ ('is_publisher', '=', 'True')]" context="{'default_is_publisher':1}"/>
                                 <field name="is_book" invisible="True"/>
                             </group>
+                            <group invisible="product_variant_count &gt; 1 and not is_product_variant">
+                                <field name="publication_date" />
+                                <field name="last_edition" />
+                                <field name="binding_type" />
+                                <field name="paper_quality" />
+                                <field name="paper_gsm" />
+                                <field name="paper_color" />
+                                <field name="total_page" />
+                                <field name="isbn" />
+                            </group>
                         </group>
                     </page>
                 </page>
+                <label for="volume" position="before">
+                    <label for="length"/>
+                    <div class="o_row" name="size" invisible="product_variant_count &gt; 1 and not is_product_variant">
+                        <field name="length" string="Length" class="oe_inline"/>
+                        <label for="width"/>
+                        <field name="width"/>
+                        <label for="height"/>
+                        <field name="height"/>
+                    </div>
+                </label>
 <!--                <field name="barcode" invisible="product_variant_count &gt; 1                         or (product_variant_count == 0                         and valid_product_template_attribute_line_ids)                         or type in ['service', 'combo']"/>-->
             </field>
         </record>
