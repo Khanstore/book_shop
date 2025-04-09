@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_saleorder_document" inherit_id="sale.report_saleorder_document">
+
+            <t t-set="address" position="replace">
+                <t t-set="address">
+                    <t t-if="doc.partner_shipping_id == doc.partner_id and doc.partner_shipping_id==doc.partner_invoice_id">
+                    </t>
+                    <t t-elif="doc.partner_shipping_id == doc.partner_id">
+                        <div>Customer and Shipping Address</div>
+                    </t>
+                    <t t-elif="doc.partner_shipping_id == doc.partner_invoice_id">
+                        <div>Shipping and Billing Address</div>
+                    </t>
+                    <strong>
+                        <t t-out="doc.partner_shipping_id.name"/>
+                    </strong>
+                    <div t-field="doc.partner_shipping_id"
+                         t-options='{"widget": "contact", "fields": ["address","phone","mobile"], "no_marker": Yes}'/>
+                    <p t-if="doc.partner_id.vat">
+                        <t t-if="doc.company_id.account_fiscal_country_id.vat_label"
+                           t-out="doc.company_id.account_fiscal_country_id.vat_label"/>
+                        <t t-else="">Tax ID</t>:
+                        <span t-field="doc.partner_id.vat"/>
+                    </p>
+                </t>
+            </t>
+
+            <t t-set="information_block" position="replace">
+                <t t-set="information_block">
+
+                        <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                           <strong> Invoicing Address</strong>
+                            <div t-field="doc.partner_invoice_id"
+                         t-options='{"widget": "contact", "fields": ["address","name"], "no_marker": True }'/>
+                        </t>
+
+
+                    <t t-if="doc.partner_shipping_id != doc.partner_id">
+                        <strong>Partner Address</strong>
+                        <div t-field="doc.partner_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                    </t>
+                </t>
+            </t>
+
+        </template>
+
+
+
+    </data>
+</odoo>
