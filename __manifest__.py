@@ -21,6 +21,7 @@ governements, etc.)
         'data/product.public.category.csv',
         'data/book.binding.type.csv',
         'data/book_shop.xml',
+        'data/product.genre.csv',
         'views/product.xml',
         'views/partner_view.xml',
         'views/sale_order.xml',

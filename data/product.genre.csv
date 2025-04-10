@@ -1,0 +1,22 @@
+id,name,description
+genre_constitutional_law,"Constitutional Law","Governs the fundamental principles and framework of the state."
+genre_criminal_law,"Criminal Law","Deals with offenses, punishments, and legal procedures for crimes."
+genre_civil_law,"Civil Law","Covers disputes between individuals, including property, contracts, and family matters."
+genre_corporate_business_law,"Corporate & Business Law","Regulates companies, trade, and financial transactions."
+genre_labor_employment_law,"Labor & Employment Law","Defines workers' rights, wages, and workplace regulations."
+genre_environmental_law,"Environmental Law","Focuses on conservation, pollution control, and sustainable development."
+genre_human_rights_law,"Human Rights Law","Protects individual freedoms and rights under national and international frameworks."
+genre_tax_law,"Tax Law","Governs taxation policies, duties, and financial regulations."
+genre_land_property_law,"Land & Property Law","Covers ownership, tenancy, and land disputes."
+genre_international_law,"International Law","Deals with treaties, diplomatic relations, and global legal agreements."
+genre_intellectual_property_law,"Intellectual Property Law","Protects creations of the mind, including inventions, trademarks, and copyrights."
+genre_family_law,"Family Law","Covers marriage, divorce, child custody, and related matters."
+genre_administrative_law,"Administrative Law","Regulates government agencies and their interactions with the public."
+genre_bankruptcy_law,"Bankruptcy Law","Covers insolvency, debt relief, and creditor-debtor relationships."
+genre_evidence_law,"Evidence Law","Regulates the admissibility and use of evidence in legal proceedings."
+genre_contract_law,"Contract Law","Governs agreements, obligations, and enforceability of contracts."
+genre_tort_law,"Tort Law","Covers civil wrongs and damages, including negligence and liability."
+genre_military_law,"Military Law","Regulates the conduct of armed forces and military personnel."
+genre_securities_law,"Securities Law","Regulates the issuance and trading of financial securities."
+
+
