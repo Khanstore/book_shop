@@ -22,6 +22,7 @@
 import urllib
 import base64
 from odoo import fields, models, api, _
+from odoo.osv import expression
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -140,6 +141,55 @@ class ProductProduct(models.Model):
     length = fields.Float("lenght")
     height = fields.Float("Height")
     width = fields.Float("Width")
+
+    @api.model
+    def name_search(self, name='', args=None, operator='ilike', limit=100):
+        # multi langual search is working 
+        user_lang = self.env.context.get('lang', 'en_US')
+        domain = args or []
+        positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
+        is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
+        matched_ids = set()
+
+        # Search in all active languages
+        active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
+
+        for lang_code in active_langs:
+            env_lang = self.with_context(lang=lang_code)
+
+            # Try exact code/barcode matches first (fast lookup)
+            products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
+            products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
+
+            if not products and is_positive:
+                products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
+                                           limit=limit)
+                limit_rest = limit and limit - len(products)
+                if limit_rest is None or limit_rest > 0:
+                    products |= env_lang.search(
+                        expression.AND([
+                            domain,
+                            [('id', 'not in', list(matched_ids)), ('name', operator, name)]
+                        ]), limit=limit_rest
+                    )
+            elif not products and not is_positive:
+                products = env_lang.search(
+                    expression.AND([
+                        domain,
+                        [('name', operator, name), '|', ('default_code', operator, name),
+                         ('default_code', '=', False)]
+                    ]), limit=limit
+                )
+
+            matched_ids.update(products.ids)
+
+            # Stop early if limit is reached
+            if limit and len(matched_ids) >= limit:
+                break
+
+        # Final result in user's language
+        final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
+        return [(product.id, product.display_name) for product in final_products.sudo()]
 
 
 class ProductGenre(models.Model):
