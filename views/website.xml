@@ -31,18 +31,20 @@
             <t t-if="product.is_book">
                 <t t-foreach="product.sudo().author_ids" t-as="author">
                     <t t-if="author_first"> By : </t>
+                    <t t-set="public_category" t-value="author.env['product.public.category'].search([('related_writer_id', '=', author.id)], limit=1)"/>
                     <!--fixme set the public_category_id for the author_id-->
-                    <t t-set="author_link" t-value="'/shop/category/'+str(author.id)"/>
+                    <t t-set="author_link" t-value="'/shop/category/'+str(public_category.id)"/>
                     <a  t-att-href="author_link"   ><t t-esc="author.sudo().name"/></a>
                     <t t-if=" not author_last">, </t>
                 </t><br/>
                 <t t-foreach="product.sudo().publisher_ids" t-as="publisher">
                     <t t-if="publisher_first"> From : </t>
-                    <!--fixme set the public_category_id for the publisher_id-->
-                    <t t-set="publisher_link" t-value="'/shop/category/'+str(publisher.id)"/>
-                    <a  t-att-href="publisher_link"  t-field="publisher.name" />
-                    <t t-if=" not publisher_last">, </t>
+                    <t t-set="public_category" t-value="publisher.env['product.public.category'].search([('related_publisher_id', '=', publisher.id)], limit=1)"/>
+                    <t t-set="publisher_link" t-value="'/shop/category/' + str(public_category.id) if public_category else '#'"/>
+                    <a t-att-href="publisher_link" t-field="publisher.name" />
+                    <t t-if="not publisher_last">, </t>
                 </t>
+
                 <div class="publication_date">
                     <t t-if="product.product_variant_id.publication_date">
                         <p>Custom Field: <span t-esc="product.product_variant_id.publication_date"/></p>
