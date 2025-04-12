@@ -43,6 +43,20 @@ class ProductTemplate(models.Model):
     length=fields.Float("lenght")
     height=fields.Float("Height")
     width=fields.Float("Width")
+    
+    # set variant fields with same value while only one variant
+    def write(self, vals):
+        update_product = True
+        if "no_update" in vals:
+            del vals["no_update"]
+            update_product= False 
+        res = super(ProductTemplate, self).write(vals)
+        if self.product_variant_count == 1 and update_product :
+            if 'list_price' in vals:
+                self.product_variant_id.write({'list_price': vals['list_price'],'no_update':True})
+            if 'standard_price' in vals:
+                self.product_variant_id.write({'standard_price': vals['standard_price'],'no_update':True})
+        return res
 
     @api.onchange('categ_id')
     def define_book_product(self):
@@ -142,6 +156,21 @@ class ProductProduct(models.Model):
     height = fields.Float("Height")
     width = fields.Float("Width")
 
+    # set template fields with same value while only one variant
+    def write(self, vals):
+        update_template = True
+        if "no_update" in vals:
+            del vals["no_update"]
+            update_template = False
+        res = super(ProductProduct, self).write(vals)
+        tmpl=self.product_tmpl_id
+        if tmpl.product_variant_count == 1 and update_template:
+            vals['no_update'] = True
+            if 'list_price' in vals:
+                tmpl.write({'list_price': vals['list_price'],'no_update':True})
+            if 'standard_price' in vals:
+                tmpl.write({'standard_price': vals['standard_price'],'no_update':True})
+        return res
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         # multi langual search is working 
