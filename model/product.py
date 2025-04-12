@@ -36,20 +36,20 @@ class ProductTemplate(models.Model):
     last_edition=fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type=fields.Many2one("book.binding.type")
-    total_page = fields.Integer("Page")
+    page_count = fields.Integer("Page")
     paper_gsm = fields.Integer("GSM")
     paper_color = fields.Many2one("book.paper.color", string="Colour")
     paper_quality = fields.Many2one("paper.quality", string="Paper Quality")
     length=fields.Float("lenght")
     height=fields.Float("Height")
     width=fields.Float("Width")
-    
+
     # set variant fields with same value while only one variant
     def write(self, vals):
         update_product = True
         if "no_update" in vals:
             del vals["no_update"]
-            update_product= False 
+            update_product= False
         res = super(ProductTemplate, self).write(vals)
         if self.product_variant_count == 1 and update_product :
             if 'list_price' in vals:
@@ -151,7 +151,7 @@ class ProductProduct(models.Model):
     last_edition = fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type = fields.Many2one("book.binding.type")
-    total_page = fields.Integer("Page")
+    page_count = fields.Integer("Page")
     length = fields.Float("lenght")
     height = fields.Float("Height")
     width = fields.Float("Width")
