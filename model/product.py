@@ -36,7 +36,7 @@ class ProductTemplate(models.Model):
     last_edition=fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type=fields.Many2one("book.binding.type")
-    page_count = fields.Integer("Page")
+    page_count = fields.Integer(string="Page")
     paper_gsm = fields.Integer("GSM")
     paper_color = fields.Many2one("book.paper.color", string="Colour")
     paper_quality = fields.Many2one("paper.quality", string="Paper Quality")
@@ -44,19 +44,25 @@ class ProductTemplate(models.Model):
     height=fields.Float("Height")
     width=fields.Float("Width")
 
+
     # set variant fields with same value while only one variant
     def write(self, vals):
-        update_product = True
-        if "no_update" in vals:
-            del vals["no_update"]
-            update_product= False
+        update_product = self.env.context.get('update_product', True)  # Check context
+        fields_to_update = ['list_price', 'standard_price','weight', 'page_count', 'length', 'height', 'width']
         res = super(ProductTemplate, self).write(vals)
+
         if self.product_variant_count == 1 and update_product :
-            if 'list_price' in vals:
-                self.product_variant_id.write({'list_price': vals['list_price'],'no_update':True})
-            if 'standard_price' in vals:
-                self.product_variant_id.write({'standard_price': vals['standard_price'],'no_update':True})
+            dict={}   #vals to update toproduct variant
+            for fld in fields_to_update:
+                if fld in vals:
+                    dict[fld] = vals[fld]                
+                
+            self.product_variant_id.with_context(update_product=False).write(dict)
+
         return res
+
+
+
 
     @api.onchange('categ_id')
     def define_book_product(self):
@@ -155,22 +161,45 @@ class ProductProduct(models.Model):
     length = fields.Float("lenght")
     height = fields.Float("Height")
     width = fields.Float("Width")
+    weight = fields.Float("Weight")
 
-    # set template fields with same value while only one variant
+    # set variant fields with same value while only one variant
     def write(self, vals):
-        update_template = True
-        if "no_update" in vals:
-            del vals["no_update"]
-            update_template = False
+        update_product = self.env.context.get('update_product', True)  # Check context
+        fields_to_update = ['list_price', 'standard_price','weight', 'page_count', 'length', 'height', 'width']
         res = super(ProductProduct, self).write(vals)
-        tmpl=self.product_tmpl_id
-        if tmpl.product_variant_count == 1 and update_template:
-            vals['no_update'] = True
-            if 'list_price' in vals:
-                tmpl.write({'list_price': vals['list_price'],'no_update':True})
-            if 'standard_price' in vals:
-                tmpl.write({'standard_price': vals['standard_price'],'no_update':True})
+
+        # if self.product_tmpl_id.product_variant_count == 1 and update_product and 'page_count' in vals:
+        #     self.product_tmpl_id.with_context(update_product=False).write({'page_count': vals['page_count']})
+        # 
+        # return 
+        # 
+        if self.product_tmpl_id.product_variant_count == 1 and update_product:
+            dict = {}  # vals to update toproduct Template
+            for fld in fields_to_update:
+                if fld in vals:
+                    dict[fld] = vals[fld]
+
+            self.product_tmpl_id.with_context(update_product=False).write(dict)
+
         return res
+
+
+    # # set template fields with same value while only one variant
+    # def write(self, vals):
+    #     update_template = True
+    #     if "no_update" in vals:
+    #         del vals["no_update"]
+    #         update_template = False
+    #     res = super(ProductProduct, self).write(vals)
+    #     tmpl=self.product_tmpl_id
+    #     if tmpl.product_variant_count == 1 and update_template:
+    #         vals['no_update'] = True
+    #         if 'list_price' in vals:
+    #             tmpl.write({'list_price': vals['list_price'],'no_update':True})
+    #         if 'standard_price' in vals:
+    #             tmpl.write({'standard_price': vals['standard_price'],'no_update':True})
+    #     return res
     @api.model
     def name_search(self, name='', args=None, operator='ilike', limit=100):
         # multi langual search is working 
