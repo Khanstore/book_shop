@@ -46,3 +46,7 @@ class SaleOrder(models.Model):
         print ("yes")
         # Open the invoice record (example: returning its form view in Odoo)
 
+    def action_send_whatsapp(self):
+        to_number=self.partner_id.mobile
+        link="https://wa.me/"+to_number +"/?text="+"https://khan-store.com/my/orders/634?access_token=f41f3d0e-4c4c-4d20-923b-9f3e239496af"
+

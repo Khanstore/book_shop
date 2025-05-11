@@ -26,5 +26,6 @@ from . import purchase_order
 from . import ashraf
 from . import stock
 from . import account_move
+from . import delivery_carrier
 
 # from . import website

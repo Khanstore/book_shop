@@ -115,4 +115,7 @@ class Partner(models.Model):
     def get_publisher_ecom_category(self):
         ecom_categ = self.env['product.public.category'].search([('related_publisher_id', '=', self._origin.id)])
         return ecom_categ
+    
+    
+
 

@@ -42,10 +42,12 @@ governements, etc.)
     'license': 'LGPL-3',
     'assets': {
         'point_of_sale._assets_pos': [
-            'book_shop/static/src/**/*',
+            'book_shop/static/src/css/pos_image_fix.css',
+            'book_shop/static/src/xml/pos_product_card.xml',
             ],
-        'website.assets_frontend': [
-            # 'book_shop/static/src/js/product_configurator.js',  # Include your JS file here
+        'web.assets_frontend': [
+            'book_shop/static/src/js/product_pages.js',  # Include your JS file here
         ],
         },
     }
+

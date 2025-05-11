@@ -24,7 +24,7 @@
                                 <field name="paper_quality" />
                                 <field name="paper_gsm" />
                                 <field name="paper_color" />
-                                <field name="page_count" />
+                                <field name="pages" />
                                 <field name="isbn" />
                             </group>
                         </group>

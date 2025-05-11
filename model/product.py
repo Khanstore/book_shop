@@ -36,7 +36,7 @@ class ProductTemplate(models.Model):
     last_edition=fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type=fields.Many2one("book.binding.type")
-    page_count = fields.Integer(string="Page")
+    pages = fields.Integer(string="Page")
     paper_gsm = fields.Integer("GSM")
     paper_color = fields.Many2one("book.paper.color", string="Colour")
     paper_quality = fields.Many2one("paper.quality", string="Paper Quality")
@@ -44,24 +44,36 @@ class ProductTemplate(models.Model):
     height=fields.Float("Height")
     width=fields.Float("Width")
 
-
-    # set variant fields with same value while only one variant
     def write(self, vals):
-        update_product = self.env.context.get('update_product', True)  # Check context
-        fields_to_update = ['list_price', 'standard_price','weight', 'page_count', 'length', 'height', 'width']
-        res = super(ProductTemplate, self).write(vals)
+        res = super().write(vals)
+        for template in self:
+            if len(template.product_variant_ids) == 1:
+                variant = template.product_variant_ids[0]
+                if not self.env.context.get('sync_from_variant'):
+                    update_vals = {}
+                    if 'list_price' in vals and template.list_price != variant.list_price:
+                        update_vals['list_price'] = template.list_price
+                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
+                        update_vals['binding_type'] = template.binding_type.id
+                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
+                        update_vals['publication_date'] = template.publication_date
+                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
+                        update_vals['last_edition'] = template.last_edition
+                    if 'pages' in vals and template.pages != variant.pages:
+                        update_vals['pages'] = template.pages
+                    if 'height' in vals and template.height != variant.height:
+                        update_vals['height'] = template.height
+                    if 'width' in vals and template.width != variant.width:
+                        update_vals['width'] = template.width
+                    if 'weight' in vals and template.weight != variant.weight:
+                        update_vals['weight'] = template.weight
+                    if 'length' in vals and template.length != variant.length:
+                        update_vals['length'] = template.length
 
-        if self.product_variant_count == 1 and update_product :
-            dict={}   #vals to update toproduct variant
-            for fld in fields_to_update:
-                if fld in vals:
-                    dict[fld] = vals[fld]                
-                
-            self.product_variant_id.with_context(update_product=False).write(dict)
 
+                    if update_vals:
+                        variant.with_context(sync_from_template=True).write(update_vals)
         return res
-
-
 
 
     @api.onchange('categ_id')
@@ -157,7 +169,7 @@ class ProductProduct(models.Model):
     last_edition = fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type = fields.Many2one("book.binding.type")
-    page_count = fields.Integer("Page")
+    pages = fields.Integer("Page")
     length = fields.Float("lenght")
     height = fields.Float("Height")
     width = fields.Float("Width")
@@ -165,25 +177,33 @@ class ProductProduct(models.Model):
 
     # set variant fields with same value while only one variant
     def write(self, vals):
-        update_product = self.env.context.get('update_product', True)  # Check context
-        fields_to_update = ['list_price', 'standard_price','weight', 'page_count', 'length', 'height', 'width']
-        res = super(ProductProduct, self).write(vals)
-
-        # if self.product_tmpl_id.product_variant_count == 1 and update_product and 'page_count' in vals:
-        #     self.product_tmpl_id.with_context(update_product=False).write({'page_count': vals['page_count']})
-        # 
-        # return 
-        # 
-        if self.product_tmpl_id.product_variant_count == 1 and update_product:
-            dict = {}  # vals to update toproduct Template
-            for fld in fields_to_update:
-                if fld in vals:
-                    dict[fld] = vals[fld]
-
-            self.product_tmpl_id.with_context(update_product=False).write(dict)
-
+        res = super().write(vals)
+        for variant in self:
+            template = variant.product_tmpl_id
+            if len(template.product_variant_ids) == 1:
+                if not self.env.context.get('sync_from_template'):
+                    update_vals = {}
+                    if 'list_price' in vals and template.list_price != variant.list_price:
+                        update_vals['list_price'] = variant.list_price
+                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
+                        update_vals['binding_type'] = variant.binding_type.id
+                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
+                        update_vals['publication_date'] = variant.publication_date
+                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
+                        update_vals['last_edition'] = variant.last_edition
+                    if 'pages' in vals and template.pages != variant.pages:
+                        update_vals['pages'] = variant.pages
+                    if 'length' in vals and template.length != variant.length:
+                        update_vals['length'] = variant.length
+                    if 'height' in vals and template.height != variant.height:
+                        update_vals['height'] = variant.height
+                    if 'width' in vals and template.width != variant.width:
+                        update_vals['width'] = variant.width
+                    if 'weight' in vals and template.weight != variant.weight:
+                        update_vals['weight'] = variant.weight
+                    if update_vals:
+                        template.with_context(sync_from_variant=True).write(update_vals)
         return res
-
 
     # # set template fields with same value while only one variant
     # def write(self, vals):
