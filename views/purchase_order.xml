@@ -7,6 +7,9 @@
     <field name="model">purchase.order</field>
     <field name="priority">2</field>
     <field name="arch" type="xml">
+        <field name='partner_id' position="attributes">
+            <attribute name="widget">many2one_avatar_user</attribute>
+        </field>
         <field name="date_order" position="before">
         <!--fixme change colour for negative value-->
             <field name="partner_balance" />
