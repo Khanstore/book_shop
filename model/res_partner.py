@@ -23,6 +23,7 @@ import urllib
 import base64
 import logging
 import re
+import difflib
 from odoo import fields, models, api, _
 # Set up logging
 _logger = logging.getLogger(__name__)
@@ -72,6 +73,25 @@ class Partner(models.Model):
 
         # Otherwise return empty or unchanged for safety
         return ''
+    def name_get(self):
+        result = []
+        for partner in self:
+            name = partner.name or ""
+            company = partner.parent_id.name if partner.parent_id else ""
+            city = partner.city or ""
+            state = partner.state_id.name or ""
+
+            # Construct display name: name + company + city + state
+            display_name = name
+            if company:
+                display_name += f" ({company})"
+            if city:
+                display_name += f", {city}"
+            if state:
+                display_name += f", {state}"
+
+            result.append((partner.id, display_name))
+        return result
 
     @api.depends('phone', 'mobile')
     def prepare_phone4search(self):
@@ -82,35 +102,65 @@ class Partner(models.Model):
                 rec.mobile_search = self.normalize_bangladesh_phone(rec.mobile)
                 
     @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        # Default name_search behavior
-        results = super().name_search(name=name, args=args, operator=operator, limit=limit)
+    def name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
+        args = args or []
+        recs = self.env['res.partner']
+        domain = args[:]
+        # used token to search for each word separately
+        if name:
+            name = name.strip()
+            name_tokens = name.lower().split()
 
-        # If searching with phone-like input (contains digits or symbols), try custom match
-        if name and re.search(r'\d', name):
-            normalized_input = self._normalize_phone(name)
+            # Search for name matches with all tokens (out-of-order)
+            token_domain = [('name', 'ilike', token) for token in name_tokens]
+            domain += ['&'] * (len(token_domain) - 1) + token_domain
 
-            domain = ['|', ('phone_search', '!=', False), ('mobile_search', '!=', False)]
-            partners = self.search(domain)  # larger sample to ensure matches
+            name_matches = self.search(domain, limit=limit)
+            recs |= name_matches
 
-            for partner in partners:
-                # phone = self._normalize_phone(partner.phone)
-                # mobile = self._normalize_phone(partner.mobile)
+            # If input contains digits, search for phone numbers too
+            if re.search(r'\d', name):
+                normalized = self._normalize_phone(name)
+                phone_matches = self.search([
+                    '|',
+                    ('phone_search', 'ilike', normalized),
+                    ('mobile_search', 'ilike', normalized)
+                ] + args, limit=limit)
+                recs |= phone_matches
 
-                if partner.phone_search and normalized_input in partner.phone_search :
-                    display_name = partner.display_name
-                    if (partner.id, display_name) not in results:
-                        results.append((partner.id, display_name))
-                if partner.mobile_search and normalized_input in partner.mobile_search:
-                    display_name = partner.display_name
-                    if (partner.id, display_name) not in results:
-                        results.append((partner.id, display_name))
+        return recs.name_get()
 
-        return results
 
-    @property
-    def _rec_names_search(self):
-        return super()._rec_names_search + ["phone_search", "mobile_search"]
+
+     # def name_search(self, name='', args=None, operator='ilike', limit=100):
+     #    # Default name_search behavior
+     #    results = super().name_search(name=name, args=args, operator=operator, limit=limit)
+     #
+     #    # If searching with phone-like input (contains digits or symbols), try custom match
+     #    if name and re.search(r'\d', name):
+     #        normalized_input = self._normalize_phone(name)
+     #
+     #        domain = ['|', ('phone_search', '!=', False), ('mobile_search', '!=', False)]
+     #        partners = self.search(domain)  # larger sample to ensure matches
+     #
+     #        for partner in partners:
+     #            # phone = self._normalize_phone(partner.phone)
+     #            # mobile = self._normalize_phone(partner.mobile)
+     #
+     #            if partner.phone_search and normalized_input in partner.phone_search :
+     #                display_name = partner.display_name
+     #                if (partner.id, display_name) not in results:
+     #                    results.append((partner.id, display_name))
+     #            if partner.mobile_search and normalized_input in partner.mobile_search:
+     #                display_name = partner.display_name
+     #                if (partner.id, display_name) not in results:
+     #                    results.append((partner.id, display_name))
+    # 
+    #     return results
+
+    # @property
+    # def _rec_names_search(self):
+    #     return super()._rec_names_search + ["phone_search", "mobile_search"]
     # @api.model
     # def init(self):
     #     super(Partner, self).init()
@@ -157,22 +207,4 @@ class Partner(models.Model):
         ecom_categ = self.env['product.public.category'].search([('related_publisher_id', '=', self._origin.id)])
         return ecom_categ
 
-    def name_get(self):
-        result = []
-        for partner in self:
-            name = partner.name or ""
-            company = partner.parent_id.name if partner.parent_id else ""
-            city = partner.city or ""
-            state = partner.state_id.name or ""
-
-            # Construct display name: name + company + city + state
-            display_name = name
-            if company:
-                display_name += f" ({company})"
-            if city:
-                display_name += f", {city}"
-            if state:
-                display_name += f", {state}"
-
-            result.append((partner.id, display_name))
-        return result
+    
