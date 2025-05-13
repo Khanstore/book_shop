@@ -77,6 +77,8 @@ class Partner(models.Model):
         result = []
         for partner in self:
             name = partner.name or ""
+            if partner.is_writer:
+                name=name +"(Writer)"
             company = partner.parent_id.name if partner.parent_id else ""
             city = partner.city or ""
             state = partner.state_id.name or ""
