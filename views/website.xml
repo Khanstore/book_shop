@@ -58,13 +58,11 @@
                     <strong>Binding:</strong> <span id="binding_value"/>
                 </div>
                 <t t-if="product_variant.sudo().pages and product_variant.sudo().pages>0 ">
-                    <div class="mt-2">
-                        <strong>Pages:</strong> <span id="pages_value">N/A</span>
-                    </div>
+
                     <t t-if="product.paper_gsm and product.paper_gsm>0">
                         ,(<t t-esc="product.paper_gsm"/> Gram
                         <t t-if="product.paper_color and product.paper_color.id>0">
-                            <t t-esc="product.paper_color.name"/>
+                            <t t-esc="product.paper_color.name"/>)
                         </t>
                         <t t-if="product.paper_quality and product.paper_quality.id>0">
                             <t t-esc="product.paper_quality.name"/>
