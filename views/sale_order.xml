@@ -30,21 +30,6 @@
                 </xpath>
             </field>
         </record>
-        <record id="sale_order_whatsapp_message" model="ir.ui.view">
-            <field name="inherit_id" ref="sale.view_order_form"/>
-            <field name="name">sale.order.whatsapp.message</field>
-            <field name="model">sale.order</field>
-            <field name="priority">2</field>
-            <field name="arch" type="xml">
-
-                <button id="send_by_email_primary" position="after">
-                    <button name="action_send_whatsapp" id="send_whatsapp"
-                            string="send Whatsapp" type="object" data-hotkey="m" invisible="state != 'draft'"
-                            class="btn-primary" />
-
-                </button>
-            </field>
-        </record>
 
 
     </data>
