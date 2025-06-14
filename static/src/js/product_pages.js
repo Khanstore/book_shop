@@ -55,9 +55,25 @@ function updatePages(productId) {
 
         if (isValidEdition) {
             editionDiv.style.display = 'block';
-            editionEl.textContent = publication;
+            editionEl.textContent = edition;
         } else {
             editionDiv.style.display = 'none';
+        }
+        // code to show paper
+        const paper = result.result?.paper ?? 0;
+        console.log("📘 paper received:", result.result);
+        const paperEl = document.getElementById('paper_value');
+        const paperDiv = document.getElementsByName('paper_div')[0];
+        const isValidpaper = (
+            (typeof paper === 'number' && paper > 0) ||
+            (typeof paper === 'string' && paper.trim() !== '')
+        );
+
+        if (isValidpaper) {
+            paperDiv.style.display = 'block';
+            paperEl.textContent = paper;
+        } else {
+            paperDiv.style.display = 'none';
         }
 
         //    code to show Binding
