@@ -49,31 +49,30 @@
                     <strong>Pages:</strong> <span id="pages_value"/>
                 </div>
                 <div name="publication_div">
-                    <strong>Published:</strong> <span id="publication_value"/>
+                    <strong>First Edition:</strong> <span id="publication_value"/>
                 </div>
                 <div name="edition_div">
                     <strong>Last Edition:</strong> <span id="edition_value"/>
                 </div>
+                <div name="paper_div">
+                    <strong>Paper:</strong> <span id="paper_value"/>
+                     <!--Paper: <t t-if="product_variant.sudo().pages and product_variant.sudo().pages>0 ">
+
+                        <t t-if="product.paper_gsm and product.paper_gsm>0">
+                            <t t-esc="product.paper_gsm"/> Gram
+                            <t t-if="product.paper_color and product.paper_color.id>0">
+                                <t t-esc="product.paper_color.name"/>
+                            </t>
+                            <t t-if="product.paper_quality and product.paper_quality.id>0">
+                                <t t-esc="product.paper_quality.name"/>
+                            </t>
+                        </t>
+                    </t>-->
+                </div>
                 <div name="binding_div">
                     <strong>Binding:</strong> <span id="binding_value"/>
                 </div>
-                <t t-if="product_variant.sudo().pages and product_variant.sudo().pages>0 ">
 
-                    <t t-if="product.paper_gsm and product.paper_gsm>0">
-                        ,(<t t-esc="product.paper_gsm"/> Gram
-                        <t t-if="product.paper_color and product.paper_color.id>0">
-                            <t t-esc="product.paper_color.name"/>)
-                        </t>
-                        <t t-if="product.paper_quality and product.paper_quality.id>0">
-                            <t t-esc="product.paper_quality.name"/>
-                        </t>
-                    </t>
-                </t>
-
-
-                    <t t-if="product_variant.sudo().binding_type.id">
-                    <br/><t t-esc="product_variant.sudo().binding_type.name"/> Binding
-                </t>
                 <t t-if="product.length and product.width and product.height">
                     <t t-if="(product.length+product.width+product.height)>0">
                         <br/>Size :<t t-esc="product.length" /> X <t t-esc="product.width"/>X <t t-esc="product.height"/>
