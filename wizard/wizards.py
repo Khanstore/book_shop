@@ -38,7 +38,7 @@ class DailyStatementWizard(models.TransientModel):
     purchase_new =fields.Many2many(comodel_name='purchase.order' ,string='Purchase' ,compute='get_purchase_new')
     payment_new =fields.Many2many(comodel_name='account.payment' ,string='Payments' ,compute='get_payment_new')
     # sales_edit =fields.Many2many(comodel_name='sale.order' ,string='sales' ,compute='get_sales_edit')
-
+    journals =fields.Many2many(comodel_name='account.journal' ,string='Bank Balances' ,compute='get_journals')
     def get_sales_new(self):
         orders =self.env['sale.order'].search([('create_date' ,'>=' ,datetime.combine(self.date_start, datetime.min.time())),
                                                ('create_date' ,'<=' ,datetime.combine(self.date_start, datetime.max.time()))])
@@ -50,6 +50,18 @@ class DailyStatementWizard(models.TransientModel):
                                                ('create_date' ,'<=' ,datetime.combine(self.date_start, datetime.max.time()))])
 
         self.purchase_new=[(6, 0, orders.ids)]
+
+    def get_balance(self,journals):
+        return self.env['account.move.line'].read_group(
+            [('journal_id', '=', journals), ('account_id.user_type_id.type', '=', 'liquidity')],
+            ['balance'],
+            []
+            )[0]['balance']
+
+    def get_journals(self):
+        journals =self.env['account.journal'].search([('type' ,'in' ,['bank', 'cash'])])
+
+        self.journals=[(6, 0, journals.ids)]
 
     def get_payment_new(self):
         orders =self.env['account.payment'].search([('create_date' ,'>=' ,datetime.combine(self.date_start, datetime.min.time())),
@@ -71,4 +83,5 @@ class DailyStatementWizard(models.TransientModel):
         self.get_sales_new()
         self.get_purchase_new()
         self.get_payment_new()
+        self.get_journals()
         # self.get_sales_edit()

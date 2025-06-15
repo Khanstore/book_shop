@@ -18,16 +18,34 @@
                         <field name="sales_new">
                             <list>
                                 <field name="name"/>
+                                <field name="partner_id"/>
+                                <field name="user_id"/>
+                                <field name="state"/>
+                                <field name="invoice_status"/>
+                                <field name="amount_total"/>
                             </list>
                         </field>
                         <field name="purchase_new">
-                            <list>
+                            <list string="Purchases">
                                 <field name="name"/>
+                                <field name="partner_id"/>
+                                <field name="user_id"/>
+                                <field name="state"/>
+                                <field name="invoice_status"/>
+                                <field name="receipt_status"/>
+                                <field name="notes"/>
+                                <field name="amount_total"/>
                             </list>
                         </field>
                         <field name="payment_new">
                             <list>
                                 <field name="name"/>
+                            </list>
+                        </field>
+                        <field name="journals">
+                            <list>
+                                <field name="name"/>
+<!--                                <field name="calculated_value"/>-->
                             </list>
                         </field>
                         <button name="update_fields" string="Update" type="object"/>
@@ -36,8 +54,13 @@
             </field>
         </record>
 
-
-
+        <record id ="action_daily_admin_report" model="ir.actions.act_window">
+            <field name="name">Daily Admin Report</field>
+            <field name="res_model">book.shop.daily.statement</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="daily_admin_report_view"/>
+            <field name="target">current</field>
+        </record>
     </data>
 
 </odoo>
