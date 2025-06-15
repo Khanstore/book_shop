@@ -24,6 +24,8 @@ import base64
 
 from odoo import fields, models, api, _
 
+
+
 class AccountMove(models.Model):
     _inherit='account.move'
 
@@ -58,3 +60,33 @@ class AccountMove(models.Model):
     def condition_payment_text(self):
         self.condition_txt= "its condition text"
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        moves = super().create(vals_list)
+        for move in moves:
+            sale_order = move.invoice_origin and self.env['sale.order'].search([('name', '=', move.invoice_origin)],
+                                                                               limit=1)
+            if sale_order:
+                if (sale_order.carrier_id.name == 'AJR' and
+                        sale_order.payment_term_id.name == 'COD'):
+                    move.invoice_payment_term_id = sale_order.payment_term_id.id
+                    move.narration = 'Please pay the delivery boy'
+
+                    # Set journal to AJR journal
+                    ajr_journal = self.env['account.journal'].search([('name', '=', 'AJR')], limit=1)
+                    if ajr_journal:
+                        move.journal_id = ajr_journal.id
+
+                    # Move lines to suspense account
+                    suspense_account = self.env['account.account'].search([('code', '=', '999999')],
+                                                                          limit=1)  # Change code
+                    for line in move.line_ids:
+                        if line.account_id.user_type_id.type == 'receivable':
+                            line.account_id = suspense_account.id
+        return moves
+
+
+class AccountPayment(models.Model):
+    _inherit='account.payment'
+
+    partner_balance= fields.Monetary("Partner Balance", related="partner_id.commercial_partner_id.total_balance")

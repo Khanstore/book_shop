@@ -23,6 +23,7 @@ import urllib
 import base64
 from odoo import fields, models, api, _
 from odoo.osv import expression
+from odoo.tools.translate import html_translate
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -61,12 +62,16 @@ class ProductTemplate(models.Model):
                         update_vals['last_edition'] = template.last_edition
                     if 'pages' in vals and template.pages != variant.pages:
                         update_vals['pages'] = template.pages
+                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
+                        update_vals['paper_gsm'] = template.paper_gsm
                     if 'height' in vals and template.height != variant.height:
                         update_vals['height'] = template.height
                     if 'width' in vals and template.width != variant.width:
                         update_vals['width'] = template.width
                     if 'weight' in vals and template.weight != variant.weight:
                         update_vals['weight'] = template.weight
+                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
+                        update_vals['description_ecommerce'] = template.description_ecommerce
                     if 'length' in vals and template.length != variant.length:
                         update_vals['length'] = template.length
 
@@ -170,11 +175,18 @@ class ProductProduct(models.Model):
     genre = fields.Many2one('product.genre', string="Genre")
     binding_type = fields.Many2one("book.binding.type")
     pages = fields.Integer("Page")
+    paper_gsm = fields.Integer("GSM")
     length = fields.Float("lenght")
     height = fields.Float("Height")
     width = fields.Float("Width")
     weight = fields.Float("Weight")
-
+    description_ecommerce = fields.Html(
+            string="eCommerce Description",
+            translate=html_translate,
+            sanitize_overridable=True,
+            sanitize_attributes=False,
+            sanitize_form=False,
+        )
     # set variant fields with same value while only one variant
     def write(self, vals):
         res = super().write(vals)
@@ -193,6 +205,8 @@ class ProductProduct(models.Model):
                         update_vals['last_edition'] = variant.last_edition
                     if 'pages' in vals and template.pages != variant.pages:
                         update_vals['pages'] = variant.pages
+                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
+                        update_vals['paper_gsm'] = variant.paper_gsm
                     if 'length' in vals and template.length != variant.length:
                         update_vals['length'] = variant.length
                     if 'height' in vals and template.height != variant.height:
@@ -201,6 +215,8 @@ class ProductProduct(models.Model):
                         update_vals['width'] = variant.width
                     if 'weight' in vals and template.weight != variant.weight:
                         update_vals['weight'] = variant.weight
+                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
+                        update_vals['description_ecommerce'] = variant.description_ecommerce
                     if update_vals:
                         template.with_context(sync_from_variant=True).write(update_vals)
         return res
