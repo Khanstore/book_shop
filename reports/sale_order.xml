@@ -33,7 +33,8 @@
                         <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
                            <strong> Invoicing Address</strong>
                             <div t-field="doc.partner_invoice_id"
-                         t-options='{"widget": "contact", "fields": ["address","name"], "no_marker": True }'/>
+                                 t-options='{"widget": "contact", "fields": ["address","phone","mobile"], "no_marker": Yes}'/>
+<!--                         t-options='{"widget": "contact", "fields": ["address","name"], "no_marker": True }'/>-->
                         </t>
 
 
@@ -47,7 +48,61 @@
 
         </template>
 
+        <template id="report_picking" inherit_id="stock.report_picking">
+             <xpath expr="//div[@class='row mb-4']" position="replace">
+            <div class="row mb-4">
+                                <div class="col-8 offset-1" name="div_incoming_address">
+                                    <t t-set="show_partner" t-value="False" />
+                                    <t t-set="show_full_address" t-value="False" />
+                                    <div t-if="o.picking_type_id.code=='incoming' and o.partner_id">
+                                        <strong>Vendor Address</strong>
+                                        <t t-set="show_partner" t-value="True" />
+                                    </div>
+                                    <div t-elif="o.picking_type_id.code=='internal' and o.partner_id">
+                                        <strong>Warehouse Address</strong>
+                                        <t t-set="show_partner" t-value="True" />
+                                    </div>
+                                    <div t-elif="o.picking_type_id.code=='outgoing' and o.partner_id and o.partner_id != o.partner_id.commercial_partner_id">
+                                        <strong>Customer Address</strong>
+                                        <t t-set="show_partner" t-value="True" />
+                                        <t t-set="show_full_address" t-value="True" />
+                                    </div>
+                                    <div t-if="show_partner" name="partner_header">
+                                        <div t-field="o.partner_id.commercial_partner_id"
+                                             t-options='{"widget": "contact", "fields": ["address", "name", "phone", "vat"] if show_full_address else ["name"], "no_marker": True, "phone_icons": True}'>
+                                             <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 opacity-75 text-muted text-center">
+                                                <strong>Recipient address</strong>
+                                                <div>Presence depends on the type of operation.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4" name="div_outgoing_address">
+                                    <div t-if="o.should_print_delivery_address()">
+                                        <strong>Delivery Address</strong>
+                                        <div t-field="o.move_ids[0].partner_id"
+                                            t-options='{"widget": "contact", "fields": ["address", "name", "phone", "mobile"], "no_marker": True, "phone_icons": True}'>
+                                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 opacity-75 text-muted text-center">
+                                                    <strong>Delivery address</strong>
+                                                    <div>Presence depends on the type of operation.</div>
+                                                </div>
+                                        </div>
+                                    </div>
+                                    <div t-elif="o.picking_type_id.code != 'internal' and o.picking_type_id.warehouse_id.partner_id">
+                                        <strong>Warehouse Address</strong>
+                                        <div t-field="o.picking_type_id.warehouse_id.partner_id"
+                                            t-options='{"widget": "contact", "fields": ["name", "phone"], "no_marker": True, "phone_icons": True}'>
+                                                <div class="bg-light border-1 rounded h-100 d-flex flex-column align-items-center justify-content-center p-4 opacity-75 text-muted text-center">
+                                                    <strong>Warehouse address</strong>
+                                                    <div>Presence depends on the type of operation.</div>
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+             </xpath>
 
+        </template>
 
     </data>
 </odoo>
