@@ -31,6 +31,7 @@ governements, etc.)
         'views/stock_picking.xml',
         'views/invoice.xml',
         'views/templates.xml',
+        'views/res_thana.xml',
         'views/account_payment.xml',
         'reports/product_product_templates.xml',
         'reports/invoice.xml',

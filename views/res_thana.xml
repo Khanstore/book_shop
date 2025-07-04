@@ -1,0 +1,42 @@
+<odoo>
+    <data>
+        <record id="book_shop_res_thana_view" model="ir.ui.view">
+            <field name="name">book.shop.res.thana.view</field>
+            <field name="model">res.thana</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+<!--                                <field name="code"/>-->
+                            </group>
+                            <group>
+                                <field name="state_id"/>
+                                <field name="country_id"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="book_shop_res_thana_tree_view" model="ir.ui.view">
+            <field name="name">book.shop.res.thana.tree.view</field>
+            <field name="model">res.thana</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="name"/>
+<!--                    <field name="code"/>-->
+                    <field name="state_id"/>
+                    <field name="country_id"/>
+                </list>
+            </field>
+        </record>
+        <record id="book_shop_res_thana_action" model="ir.actions.act_window">
+            <field name="name">Thanas</field>
+            <field name="res_model">res.thana</field>
+            <field name="view_mode">list,form</field>
+            <field name="view_id" ref="book_shop_res_thana_tree_view"/>
+        </record>
+    </data>
+</odoo>
