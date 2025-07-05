@@ -9,3 +9,4 @@ book_shop.access_myfunctions,access_myfunctions,book_shop.model_myfunctions,base
 book_shop.access_picking_confirmation_wizard,access_picking_confirmation_wizard,book_shop.model_picking_confirmation_wizard,base.group_public,1,1,1,0
 book_shop.access_picking_confirmation_wizard,access_picking_confirmation_wizard,book_shop.model_picking_confirmation_wizard,base.group_user,1,1,1,0
 book_shop.access_book_shop_daily_statement,access_book_shop_daily_statement,book_shop.model_book_shop_daily_statement,base.group_user,1,1,1,1
+book_shop.access_res_thana,access_res_thana,book_shop.model_res_thana,base.group_user,1,0,0,0
