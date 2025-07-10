@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-<!--fIXME FOLLOWING TEMPLATE IS FOR SHOWING PARTNER MOBILE AND PHONE nO-->
+    <!--fIXME FOLLOWING TEMPLATE IS FOR SHOWING PARTNER MOBILE AND PHONE nO-->
     <template id="report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
-       <!-- <xpath expr="//div[@t-field='doc.partner_id']" position="after">
-            <t t-if="doc.partner_id.mobile">
-                <p>
-                    <span t-field="doc.partner_id.mobile"/>
-                </p>
-            </t>
-            <t t-elif="doc.partner_id.phone">
-                <p>
-                    <span t-field="doc.partner_id.phone"/>
-                </p>
-            </t>
-            <t t-elif="doc.partner_id.parent_id.mobile">
-                <p>
-                    (Rq) <span t-field="doc.partner_id.parent_id.mobile"/>
-                </p>
-            </t>
-            <t t-elif="doc.partner_id.parent_id.phone">
-                <p>
-                   (Rq) <span t-field="doc.partner_id.parent_id.phone"/>
-                </p>
-            </t>
-        </xpath>-->
+        <!-- <xpath expr="//div[@t-field='doc.partner_id']" position="after">
+             <t t-if="doc.partner_id.mobile">
+                 <p>
+                     <span t-field="doc.partner_id.mobile"/>
+                 </p>
+             </t>
+             <t t-elif="doc.partner_id.phone">
+                 <p>
+                     <span t-field="doc.partner_id.phone"/>
+                 </p>
+             </t>
+             <t t-elif="doc.partner_id.parent_id.mobile">
+                 <p>
+                     (Rq) <span t-field="doc.partner_id.parent_id.mobile"/>
+                 </p>
+             </t>
+             <t t-elif="doc.partner_id.parent_id.phone">
+                 <p>
+                    (Rq) <span t-field="doc.partner_id.parent_id.phone"/>
+                 </p>
+             </t>
+         </xpath>-->
     </template>
 
     <template id="product" inherit_id="website_sale.product">
@@ -31,51 +31,65 @@
         <xpath expr="//div[@id='product_details']/h1" position="after">
             <t t-if="product.is_book">
                 <t t-foreach="product.sudo().author_ids" t-as="author">
-                    <t t-if="author_first"> By : </t>
-                    <t t-set="public_category" t-value="author.env['product.public.category'].search([('related_writer_id', '=', author.id)], limit=1)"/>
+                    <t t-if="author_first">By :</t>
+                    <t t-set="public_category"
+                       t-value="author.env['product.public.category'].search([('related_writer_id', '=', author.id)], limit=1)"/>
 
                     <t t-set="author_link" t-value="'/shop/category/'+str(public_category.id)"/>
-                    <a  t-att-href="author_link"   ><t t-esc="author.sudo().name"/></a>
-                    <t t-if=" not author_last">, </t>
-                </t><br/>
+                    <a t-att-href="author_link">
+                        <t t-esc="author.sudo().name"/>
+                    </a>
+                    <t t-if=" not author_last">,</t>
+                </t>
+                <br/>
                 <t t-foreach="product.sudo().publisher_ids" t-as="publisher">
-                    <t t-if="publisher_first"> From : </t>
-                    <t t-set="public_category" t-value="publisher.env['product.public.category'].search([('related_publisher_id', '=', publisher.id)], limit=1)"/>
-                    <t t-set="publisher_link" t-value="'/shop/category/' + str(public_category.id) if public_category else '#'"/>
-                    <a t-att-href="publisher_link" t-field="publisher.name" />
-                    <t t-if="not publisher_last">, </t>
+                    <t t-if="publisher_first">From :</t>
+                    <t t-set="public_category"
+                       t-value="publisher.env['product.public.category'].search([('related_publisher_id', '=', publisher.id)], limit=1)"/>
+                    <t t-set="publisher_link"
+                       t-value="'/shop/category/' + str(public_category.id) if public_category else '#'"/>
+                    <a t-att-href="publisher_link" t-field="publisher.name"/>
+                    <t t-if="not publisher_last">,</t>
                 </t>
                 <div name="pages_div">
-                    <strong>Pages:</strong> <span id="pages_value"/>
+                    <strong>Pages:</strong>
+                    <span id="pages_value"/>
                 </div>
                 <div name="publication_div">
-                    <strong>First Edition:</strong> <span id="publication_value"/>
+                    <strong>First Edition:</strong>
+                    <span id="publication_value"/>
                 </div>
                 <div name="edition_div">
-                    <strong>Last Edition:</strong> <span id="edition_value"/>
+                    <strong>Last Edition:</strong>
+                    <span id="edition_value"/>
                 </div>
                 <div name="paper_div">
-                    <strong>Paper:</strong> <span id="paper_value"/>
-                     <!--Paper: <t t-if="product_variant.sudo().pages and product_variant.sudo().pages>0 ">
+                    <strong>Paper:</strong>
+                    <span id="paper_value"/>
+                    <!--Paper: <t t-if="product_variant.sudo().pages and product_variant.sudo().pages>0 ">
 
-                        <t t-if="product.paper_gsm and product.paper_gsm>0">
-                            <t t-esc="product.paper_gsm"/> Gram
-                            <t t-if="product.paper_color and product.paper_color.id>0">
-                                <t t-esc="product.paper_color.name"/>
-                            </t>
-                            <t t-if="product.paper_quality and product.paper_quality.id>0">
-                                <t t-esc="product.paper_quality.name"/>
-                            </t>
-                        </t>
-                    </t>-->
+                       <t t-if="product.paper_gsm and product.paper_gsm>0">
+                           <t t-esc="product.paper_gsm"/> Gram
+                           <t t-if="product.paper_color and product.paper_color.id>0">
+                               <t t-esc="product.paper_color.name"/>
+                           </t>
+                           <t t-if="product.paper_quality and product.paper_quality.id>0">
+                               <t t-esc="product.paper_quality.name"/>
+                           </t>
+                       </t>
+                   </t>-->
                 </div>
                 <div name="binding_div">
-                    <strong>Binding:</strong> <span id="binding_value"/>
+                    <strong>Binding:</strong>
+                    <span id="binding_value"/>
                 </div>
 
                 <t t-if="product.length and product.width and product.height">
                     <t t-if="(product.length+product.width+product.height)>0">
-                        <br/>Size :<t t-esc="product.length" /> X <t t-esc="product.width"/>X <t t-esc="product.height"/>
+                        <br/>Size :
+                        <t t-esc="product.length"/>
+                        X<t t-esc="product.width"/>X
+                        <t t-esc="product.height"/>
                     </t>
                 </t>
 
@@ -83,9 +97,9 @@
             </t>
         </xpath>
 
-       <!--<div class="js_product js_main_product mb-3" position="inside">
-           dsdss<t t-esc="product_variant.page_count"/>
-       </div>-->
+        <!--<div class="js_product js_main_product mb-3" position="inside">
+            dsdss<t t-esc="product_variant.page_count"/>
+        </div>-->
 
     </template>
 
@@ -96,17 +110,18 @@
                 <t t-foreach="product.author_ids" t-as="author">
                     <!--fixme set the public_category_id for the author_id-->
                     <t t-set="author_link" t-value="'/shop/category/'+str(author.get_author_ecom_category().id)"/>
-                    <a  t-att-href="author_link"  t-field="author.name" />,
-                </t><br/>
+                    <a t-att-href="author_link" t-field="author.name"/>,
+                </t>
+                <br/>
                 <h7>Publisher:</h7>
                 <t t-foreach="product.publisher_ids" t-as="publisher">
                     <!--fixme set the public_category_id for the publisher_id-->
-                    <t t-set="publisher_link" t-value="'/shop/category/'+str(publisher.get_publisher_ecom_category().id)"/>
-                    <a  t-att-href="publisher_link"  t-field="publisher.name" />,
+                    <t t-set="publisher_link"
+                       t-value="'/shop/category/'+str(publisher.get_publisher_ecom_category().id)"/>
+                    <a t-att-href="publisher_link" t-field="publisher.name"/>,
                 </t>
             </t>
         </xpath>
-
 
 
     </template>
@@ -114,32 +129,52 @@
     <template id="footer_custom_inherit" inherit_id="website.footer_custom">
         <xpath expr="//div[@id='footer']//div[@class='col-lg-5 pt24 pb24']/p" position="replace">
             <p>খাঁন স্টোর একটি সনামধন্য ইউনিফর্ম সামগ্রী প্রস্তুত, বিক্রয় ও সরবরাহকারী প্রতিষ্ঠান।
-            <br/><br/>Feel free to add more details about your products, services, and mission.</p>
+                <br/>
+                <br/>মানসম্মত পন্য ও সেবা প্রদানে আমরা বদ্ধপরিকর।গ্রাহকদের সন্তুষ্টি অর্জন করাই  আমাদের লক্ষ্য ।
+            </p>
         </xpath>
         <div id='connect' position="replace">
             <xpath expr="div[@id='connect']" id="connect" class="col-lg-4 offset-lg-1 pt24 pb24">
-                            <h5 class="mb-3">Connect with us</h5>
-                            <ul class="list-unstyled">
-                                <li><i class="fa fa-comment fa-fw me-2"/><span><a href="/contactus">Contact us</a></span></li>
-                                <li><i class="fa fa-envelope fa-fw me-2"/><span><a href="mailto:khan.store.digital@gmail.com">khan.store.digital@gmail.comcom</a></span></li>
-                                <li><i class="fa fa-phone fa-fw me-2"/><span class="o_force_ltr"><a href="tel:+88 017-2056-9256">+88 017-2056-9256</a></span></li>
-                            </ul>
-                            <div class="s_social_media text-start o_not_editable" data-snippet="s_social_media" data-name="Social Media" contenteditable="false">
-                                <h5 class="s_social_media_title d-none" contenteditable="true">Follow us</h5>
-                                <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank" aria-label="Facebook">
-                                    <i class="fa fa-facebook rounded-circle shadow-sm o_editable_media"/>
-                                </a>
-                                <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank" aria-label="X">
-                                    <i class="fa fa-twitter rounded-circle shadow-sm o_editable_media"/>
-                                </a>
-                                <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank" aria-label="LinkedIn">
-                                    <i class="fa fa-linkedin rounded-circle shadow-sm o_editable_media"/>
-                                </a>
-                                <a href="/" class="text-800" aria-label="Extra page">
-                                    <i class="fa fa-home rounded-circle shadow-sm o_editable_media"/>
-                                </a>
-                            </div>
-                        </xpath>
+                <h5 class="mb-3">Connect with us</h5>
+                <ul class="list-unstyled">
+                    <li>
+                        <i class="fa fa-comment fa-fw me-2"/>
+                        <span>
+                            <a href="/contactus">Contact us</a>
+                        </span>
+                    </li>
+                    <li>
+                        <i class="fa fa-envelope fa-fw me-2"/>
+                        <span>
+                            <a href="mailto:khan.store.digital@gmail.com">khan.store.digital@gmail.com</a>
+                        </span>
+                    </li>
+                    <li>
+                        <i class="fa fa-phone fa-fw me-2"/>
+                        <span class="o_force_ltr">
+                            <a href="tel:+88 017-2056-9256">+88 017-2056-9256</a>
+                        </span>
+                    </li>
+                </ul>
+                <div class="s_social_media text-start o_not_editable" data-snippet="s_social_media"
+                     data-name="Social Media" contenteditable="false">
+                    <h5 class="s_social_media_title d-none" contenteditable="true">Follow us</h5>
+                    <a href="/website/social/facebook" class="s_social_media_facebook" target="_blank"
+                       aria-label="Facebook">
+                        <i class="fa fa-facebook rounded-circle shadow-sm o_editable_media"/>
+                    </a>
+                    <a href="/website/social/twitter" class="s_social_media_twitter" target="_blank" aria-label="X">
+                        <i class="fa fa-twitter rounded-circle shadow-sm o_editable_media"/>
+                    </a>
+                    <a href="/website/social/linkedin" class="s_social_media_linkedin" target="_blank"
+                       aria-label="LinkedIn">
+                        <i class="fa fa-linkedin rounded-circle shadow-sm o_editable_media"/>
+                    </a>
+                    <a href="/" class="text-800" aria-label="Extra page">
+                        <i class="fa fa-home rounded-circle shadow-sm o_editable_media"/>
+                    </a>
+                </div>
+            </xpath>
         </div>
     </template>
 </odoo>
