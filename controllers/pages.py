@@ -5,7 +5,7 @@ class ProductVariantPages(http.Controller):
     @http.route('/get_product_pages', type='json', auth='public', website=True)
     def get_product_pages(self, **kwargs):
         product_id = int(kwargs.get('product_id', 0))
-        product = request.env['product.product'].browse(product_id)
+        product = request.env['product.product'].sudo().browse(product_id)
         paper=""
         if product.paper_gsm and product.paper_gsm > 0:
             paper += f"{product.paper_gsm} Gram"
