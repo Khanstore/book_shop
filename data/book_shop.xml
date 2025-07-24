@@ -12,6 +12,23 @@
         <field name="name">Of-White </field>
         <field name="description">Of-White Color</field>
     </record>
+
+
+
+    <record id="base.lang_bn_IN" model="res.lang">
+      <field name="active">True</field>
+      <field name="code">bn_IN</field>
+      <field name="name">Bengali / বাংলা</field>
+      <field name="date_format">%d/%m/%Y</field>
+    </record>
+
+    <record id="base.lang_en" model="res.lang">
+      <field name="active">True</field>
+      <field name="code">en_US</field>
+      <field name="name">English (US)</field>
+      <field name="date_format">%d/%m/%Y</field>
+    </record>
+
 <!--    <record id="paper_type_white_offset_80" model="paper.type">-->
 <!--        <field name="gsm">80</field>-->
 <!--        <field name="paper_quality" ref="paper_quality_offset"/>-->
