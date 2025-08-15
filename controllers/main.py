@@ -4,7 +4,14 @@ from odoo.http import request
 from odoo.addons.portal.controllers.portal import pager as portal_pager
 from odoo.addons.website.controllers.main import Home  # Inherit from Website controller
 
+
+
+
 class CustomWebsiteController(Home):
+    @http.route('/custom/page', type='http', auth='public', website=True)
+    def custom_page(self, **kw):
+        categories= request.env['product.category'].sudo().search([], order='name asc')
+        return request.render('book_shop.custom_page_templates', {"categories":categories})
 
     @http.route([
         '/website/search',
