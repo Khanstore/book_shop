@@ -12,7 +12,7 @@ governements, etc.)
     """,
     'version': '18.0.1.0.0',
     'category': 'Others',
-    'depends' : ['website_sale','website','base','product','accountant','account','purchase','point_of_sale'],
+    'depends' : ['base','website_sale','website','base','product','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',
     'application': False,
     'data': [
@@ -22,6 +22,7 @@ governements, etc.)
         'data/book.binding.type.csv',
         'data/book_shop.xml',
         'data/product.genre.csv',
+        'data/res.lang.csv',
         'views/product.xml',
         'views/partner_view.xml',
         'views/sale_order.xml',
