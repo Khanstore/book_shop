@@ -29,8 +29,8 @@ class DailyStatementWizard(models.TransientModel):
     _description ='Create a statement which reflects every action or change in certain date'
 
     name =fields.Char("Daily Administrative Statement")
-    date_start =fields.Date("Start",default=fields.Date.today)
-    date_end =fields.Date("end")
+    date_start =fields.Date("Start",default=lambda self: datetime.today().date() - timedelta(days=1))
+    date_end =fields.Date("Up to",default=fields.Date.today)
     mode=fields.Selection(string='Report mode',
         selection=[('short', 'Short'), ('long', 'Long')],
         default="short")
@@ -51,12 +51,12 @@ class DailyStatementWizard(models.TransientModel):
 
         self.purchase_new=[(6, 0, orders.ids)]
 
-    def get_balance(self,journals):
+    def get_balance(self,journals,date_end=None):
+        domain=[('journal_id', '=', journals),('account_id.account_type','=','asset_cash')]
+        if date_end != None:
+            domain.append(('date_maturity', '<=', date_end))
         return self.env['account.move.line'].read_group(
-            [('journal_id', '=', journals), ('account_id.user_type_id.type', '=', 'liquidity')],
-            ['balance'],
-            []
-            )[0]['balance']
+            domain,  ['balance:sum'], [])[0]['balance']
 
     def get_journals(self):
         journals =self.env['account.journal'].search([('type' ,'in' ,['bank', 'cash'])])
@@ -65,7 +65,7 @@ class DailyStatementWizard(models.TransientModel):
 
     def get_payment_new(self):
         orders =self.env['account.payment'].search([('create_date' ,'>=' ,datetime.combine(self.date_start, datetime.min.time())),
-                                               ('create_date' ,'<=' ,datetime.combine(self.date_start, datetime.max.time()))])
+                                               ('create_date' ,'<=' ,datetime.combine(self.date_end, datetime.max.time()))])
 
         self.payment_new=[(6, 0, orders.ids)]
 
