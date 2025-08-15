@@ -32,6 +32,7 @@ class ProductTemplate(models.Model):
     isbn = fields.Char(string="ISBN")
     author_ids = fields.Many2many(comodel_name="res.partner", relation='author_book_rel',column1='author_of',column2="author_ids", string="Author")
     publisher_ids = fields.Many2many(comodel_name="res.partner",relation='publisher_book_rel',column1='publisher_of',column2='publisher_ids',string="Publisher")
+    # todo add translatro colum
     # "res.partner",'publisher_book_rel','published_books','publisher_ids',string="Publisher"
     publication_date = fields.Char(string="Publication Date")
     last_edition=fields.Char(string="Last Edition")
@@ -136,6 +137,7 @@ class ProductTemplate(models.Model):
     #         domain = ['|'] + domain + [('id', 'in', list(translated_product_ids))]
     #
     #     return self.search(domain + args, limit=limit).name_get()
+
     @api.model
     def name_search(self, name, args=None, operator='ilike', limit=100):
         args = args or []
