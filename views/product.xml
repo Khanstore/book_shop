@@ -60,4 +60,15 @@
             </form>
         </field>
     </record>
+
+    <record id="product_public_category_form_view" model="ir.ui.view">
+        <field name="model">product.public.category</field>
+        <field name="name">product.public.category.form</field>
+        <field name="inherit_id" ref="website_sale.product_public_category_form_view"/>
+        <field name="arch" type="xml">
+            <field name="parent_id" position="after">
+                <field name="is_published"/>
+            </field>
+        </field>
+    </record>
 </odoo>

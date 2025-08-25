@@ -21,6 +21,9 @@
 ###################################################################################
 import urllib
 import base64
+
+from pygments.lexer import default
+
 from odoo import fields, models, api, _
 from odoo.osv import expression
 from odoo.tools.translate import html_translate
@@ -294,11 +297,12 @@ class ProductGenre(models.Model):
     name = fields.Char(string="Genre", required=True ,translate=True)
     description = fields.Char(string="Description", required=True,translate=True)
 
-class ProductPublicCategory(models.Model):
-    _inherit='product.public.category'
-    _description='this modules adds product public categories for writer and publishers'
-    related_writer_id=fields.Many2one('res.partner',"Writer")
-    related_publisher_id=fields.Many2one('res.partner',"Publisher")
+# class ProductPublicCategory(models.Model):
+#     _inherit='product.public.category'
+#     _description='this modules adds product public categories for writer and publishers'
+#     is_published=fields.Boolean("Is Published")
+#     related_writer_id=fields.Many2one('res.partner',"Writer")
+#     related_publisher_id=fields.Many2one('res.partner',"Publisher")
 
 # class PaperQuality(models.Model):
 #     _name = 'paper.type'
@@ -347,6 +351,7 @@ class BookBindingType(models.Model):
 class ProductPublicCategory(models.Model):
     _inherit='product.public.category'
     _description='this modules adds product public categories for writer and publishers'
+    is_published = fields.Boolean("Is Published", default=False)
     related_writer_id=fields.Many2one('res.partner',"Writer")
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
 
