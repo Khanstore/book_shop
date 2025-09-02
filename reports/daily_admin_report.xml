@@ -13,13 +13,18 @@
                         </h5>
                         <h4>Sales</h4>
                         <div class="row">
+                            <div class="col">Date</div>
                             <div class="col">Order No</div>
                             <div class="col">Partner</div>
                             <div class="col">State</div>
                             <div class="col">amount</div>
                         </div>
+                        <t t-set="total_sales" t-value="0.0"/>
                         <t t-foreach="docs.sales_new" t-as="sale">
                             <div class="row">
+                                <div class="col">
+                                    <t t-esc="sale.date_order"/>
+                                </div>
                                 <div class="col">
                                     <t t-esc="sale.name"/>
                                 </div>
@@ -34,6 +39,7 @@
                                     <t t-esc="sale.amount_total"/>
                                 </div>
                             </div>
+                            <t t-set="total_sales" t-value="total_sales+sale.amount_total"/>
                             <t t-if="docs.mode=='long'">
                                 <div class="row">
                                     <div class="col"></div>
@@ -44,6 +50,69 @@
                                     <div class="col">Total</div>
                                 </div>
                                 <t t-foreach="sale.order_line" t-as="line">
+                                    <div class="row">
+                                        <div class="col"></div>
+                                        <div class="col">
+                                            <t t-esc="line.product_id.name"/>
+                                        </div>
+                                        <div class="col">
+                                            <t t-esc="line.product_uom_qty"/>
+                                            <t t-esc="line.product_uom.name"/>
+                                        </div>
+                                        <div class="col">
+                                            <t t-esc="line.price_unit"/>
+                                        </div>
+                                        <div class="col">
+                                            <t t-esc="line.price_tax"/>
+                                        </div>
+                                        <div class="col">
+                                            <t t-esc="line.price_total"/>
+                                        </div>
+                                    </div>
+                                </t>
+                            </t>
+                        </t>
+                        <div class="row">
+                            <div class="col">Total</div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"><t t-esc="total_sales"/></div>
+                        </div>
+
+                        <h4>Quotations</h4>
+                        <div class="row">
+                            <div class="col">Order No</div>
+                            <div class="col">Partner</div>
+                            <div class="col">State</div>
+                            <div class="col">amount</div>
+                        </div>
+                        <t t-foreach="docs.quote_new" t-as="quote">
+                            <div class="row">
+                                <div class="col">
+                                    <t t-esc="quote.name"/>
+                                </div>
+                                <div class="col">
+                                    <t t-esc="quote.partner_id.name"/>
+                                    (<t t-esc="quote.partner_id.total_balance"/>)
+                                </div>
+                                <div class="col">
+                                    <t t-esc="quote.state"/>
+                                </div>
+                                <div class="col">
+                                    <t t-esc="quote.amount_total"/>
+                                </div>
+                            </div>
+                            <t t-if="docs.mode=='long'">
+                                <div class="row">
+                                    <div class="col"></div>
+                                    <div class="col">Product</div>
+                                    <div class="col">Qty</div>
+                                    <div class="col">Rate</div>
+                                    <div class="col">tax</div>
+                                    <div class="col">Total</div>
+                                </div>
+                                <t t-foreach="quote.order_line" t-as="line">
                                     <div class="row">
                                         <div class="col"></div>
                                         <div class="col">
@@ -119,6 +188,7 @@
                         <h4>payments</h4>
                         <div class="row">
                             <div class="col">Name</div>
+                            <div class="col">Date</div>
                             <div class="col">Partner</div>
                             <div class="col">State</div>
                             <div class="col">Journal</div>
@@ -127,10 +197,15 @@
                             <div class="col">Credit</div>
                             <div class="col">Debit</div>
                         </div>
+                        <t t-set="total_credit" t-value="0.0"/>
+                        <t t-set="total_debit" t-value="0.0"/>
                         <t t-foreach="docs.payment_new" t-as="payment">
                             <div class="row">
                                 <div class="col">
                                     <t t-esc="payment.name"/>
+                                </div>
+                                 <div class="col">
+                                    <t t-esc="payment.date"/>
                                 </div>
                                 <div class="col">
                                     <t t-esc="payment.partner_id.name"/>
@@ -151,6 +226,7 @@
                                 <t t-if="payment.payment_type=='inbound'">
                                     <div class="col">
                                         <t t-esc="payment.amount"/>
+                                        <t t-set="total_credit" t-value="total_credit+payment.amount"/>
                                     </div>
                                     <div class="col">
                                         0.00
@@ -161,34 +237,49 @@
                                         0.00
                                     </div>
                                     <div class="col">
+
+                                        <t t-set="total_debit" t-value="total_debit+payment.amount"/>
                                         <t t-esc="payment.amount"/>
                                     </div>
                                 </t>
                             </div>
 
                         </t>
+                        <div class="row">
+                            <div class="col">Total</div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col"></div>
+                            <div class="col">Difference</div>
+                            <div class="col"><t t-esc="total_credit-total_debit"/></div>
+                            <div class="col"></div>
+                            <div class="col"><t t-esc="total_credit"/> </div>
+                            <div class="col"><t t-esc="total_debit"/> </div>
+                        </div>
                         <h4>Balance</h4>
                          <div class="row">
                             <div class="col">Journal</div>
-                            <div class="col">Balance on <t t-esc="docs.date_start.strftime('%d-%m-%Y')" /></div>
-                            <div class="col">Balance on <t t-esc="docs.date_end.strftime('%d-%m-%Y')" /></div>
+                            <div class="col">Opening Balance on <t t-esc="docs.date_start.strftime('%d-%m-%Y')" /></div>
+                            <div class="col">closing Balance on <t t-esc="docs.date_end.strftime('%d-%m-%Y')" /></div>
                             <div class="col">Change/></div>
                         </div>
                         <t t-set="starting_total" t-value="0.0"/>
                         <t t-set="ending_total" t-value="0.0"/>
                         <t t-set="changing_total" t-value="0.0"/>
+                        <t t-set="starting_balances" t-value="docs._get_direct_bank_payments(docs.date_start)" />
+                        <t t-set="ending_balances" t-value="docs._get_direct_bank_payments(docs.date_end,True)" />
                         <t t-foreach="docs.journals" t-as="journal">
                             <div class="row">
                                 <div class="col">
                                     <t t-esc="journal.name"/>
                                 </div>
                                     <div class="col">
-                                        <t t-set="start_balance" t-value="docs.get_balance(journal.id,docs.date_start)"/>
+                                        <t t-set="start_balance" t-value="starting_balances[journal.id][1]"/>
                                         <t t-esc="start_balance"/>
                                         <t t-set="starting_total" t-value="starting_total+start_balance"/>
                                     </div>
                                 <div class="col">
-                                        <t t-set="end_balance" t-value="docs.get_balance(journal.id,docs.date_end)"/>
+                                    <t t-set="end_balance" t-value="ending_balances[journal.id][1]"/>
                                     <t t-esc="end_balance"/>
                                     <t t-set="ending_total" t-value="ending_total+end_balance"/>
                                     </div>

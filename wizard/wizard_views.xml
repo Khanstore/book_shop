@@ -25,6 +25,16 @@
                                 <field name="amount_total"/>
                             </list>
                         </field>
+                        <field name="quote_new">
+                            <list>
+                                <field name="name"/>
+                                <field name="partner_id"/>
+                                <field name="user_id"/>
+                                <field name="state"/>
+                                <field name="invoice_status"/>
+                                <field name="amount_total"/>
+                            </list>
+                        </field>
                         <field name="purchase_new">
                             <list string="Purchases">
                                 <field name="name"/>

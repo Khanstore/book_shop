@@ -22,7 +22,7 @@
 import urllib
 import base64
 
-from pygments.lexer import default
+# from pygments.lexer import default
 
 from odoo import fields, models, api, _
 from odoo.osv import expression

@@ -15,6 +15,8 @@ governements, etc.)
     'depends' : ['base','website_sale','website','base','product','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',
     'application': False,
+    'post_init_hook': 'cleanup_old_data',
+
     'data': [
         'security/ir.model.access.csv',
         'data/product.category.csv',
