@@ -130,6 +130,48 @@ class DailyStatementWizard(models.TransientModel):
 
         self.journals=[(6, 0, journals.ids)]
 
+    def _get_suspend_bank_payments(self, date=None, including=False):
+        journals = self.env['account.journal'].search([('type', 'in', ('bank', 'cash', 'credit'))])
+        query = """
+            SELECT move.journal_id AS journal_id,
+                   move.company_id AS company_id,
+                   move.currency_id AS currency,
+                   SUM(CASE
+                       WHEN payment.payment_type = 'outbound' THEN -payment.amount
+                       ELSE payment.amount
+                   END) AS amount_total,
+                   SUM(amount_company_currency_signed) AS amount_total_company
+              FROM account_payment payment
+              JOIN account_move move ON move.origin_payment_id = payment.id
+              JOIN account_journal journal ON move.journal_id = journal.id
+             WHERE payment.is_matched IS False
+               AND move.state = 'posted'
+               AND payment.journal_id = ANY(%s)
+               AND payment.company_id = ANY(%s)
+               AND payment.outstanding_account_id = journal.suspense_account_id
+        """
+
+        params = [journals.ids, self.env.companies.ids]
+
+        if date:
+            if including:
+                query += " AND move.date <= %s"
+            else:
+                query += " AND move.date < %s"
+            params.append(date)
+
+        query += " GROUP BY move.company_id, move.journal_id, move.currency_id"
+
+        self.env.cr.execute(query, params)
+        query_result = group_by_journal(self.env.cr.dictfetchall())
+
+        result = {}
+        for journal in journals:
+            currency = (journal.currency_id or journal.company_id.sudo().currency_id).with_env(self.env)
+            result[journal.id] = self._count_results_and_sum_amounts(query_result.get(journal.id, []), currency)
+
+        return result
+
     def _get_direct_bank_payments(self, date=None, including=False):
         journals = self.env['account.journal'].search([('type', 'in', ('bank', 'cash', 'credit'))])
         query = """

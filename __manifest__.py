@@ -44,6 +44,7 @@ governements, etc.)
         'reports/daily_admin_report.xml',
         'views/khan_store_page.xml',
         'views/menu.xml',
+        'todo_applet/todo_applet_view.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',

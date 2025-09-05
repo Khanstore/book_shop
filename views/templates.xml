@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <template id="sale_order_portal_content" name="Sales Order Portal Content" inherit_id="sale.sale_order_portal_content">
+        <div t-field="sale_order.partner_invoice_id" position="replace">
+            <div t-field="sale_order.partner_invoice_id" t-options="{'widget': 'contact', 'fields': ['name', 'address', 'phone', 'mobile', 'email']}"/>
+        </div>
+        <div t-field="sale_order.partner_shipping_id" position="replace">
+            <div t-field="sale_order.partner_shipping_id" t-options='{ "widget": "contact", "fields": [ "name", "address","phone","email","mobile"]}'/>
+        </div>
+    </template>
+
+
+
     <template id="website_sale.address" name="Address Management">
         <t t-set="no_footer" t-value="1"/>
         <t t-call="website.layout">

@@ -22,6 +22,7 @@
 from . import model
 from . import controllers
 from . import wizard
+from . import todo_applet
 
 def cleanup_old_data(cr, registry):
     cr.execute("""
@@ -47,3 +48,4 @@ def cleanup_old_data(cr, registry):
         
 
         """)
+    print("Old data cleaned up successfully.")
