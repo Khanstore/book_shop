@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <template id="report_picking" inherit_id="stock.report_picking">
+            <p t-field="o.note" position="after">
+                <t t-if="o.is_cash_on_delivery">
+                    <strong style="color:red;">Condition:</strong>
+                    <spaan style="color:red;"><t t-esc="o.cod_amount"/></spaan>
+                </t>
+
+            </p>
+        </template>
+
+
+    </data>
+</odoo>

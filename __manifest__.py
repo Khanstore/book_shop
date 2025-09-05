@@ -42,6 +42,7 @@ governements, etc.)
         'data/book_shop_pages.xml',
         'wizard/wizard_views.xml',
         'reports/daily_admin_report.xml',
+        'reports/stock_piking.xml',
         'views/khan_store_page.xml',
         'views/menu.xml',
         'todo_applet/todo_applet_view.xml',
