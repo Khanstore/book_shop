@@ -87,6 +87,68 @@ class DailyStatementWizard(models.TransientModel):
     def get_previous_date(self, date):
         return date - timedelta(days=1)
 
+
+
+    def _get_journal_dashboard_bank_running_balance(self, date=None, including=False):
+        # In order to not recompute everything from the start, we take the last
+        # bank statement and only sum starting from there.
+        if not date:
+            date = fields.Date.context_today(self)
+
+        if including:
+            date=datetime.today() + timedelta(days=1)
+        journals = self.env['account.journal'].search([('type', 'in', ('bank', 'cash', 'credit'))])
+
+
+        params = {
+            'on_date': date ,
+            'journals': journals.ids,
+            'companies': self.env.companies.ids,
+        }
+
+        self._cr.execute("""
+            SELECT journal.id AS journal_id,
+                   statement.id AS statement_id,
+                   COALESCE(statement.balance_end_real, 0) AS balance_end_real,
+                   without_statement.amount AS unlinked_amount,
+                   without_statement.count AS unlinked_count
+              FROM account_journal journal
+         LEFT JOIN LATERAL (  -- select latest statement based on the date
+                           SELECT id,
+                                  first_line_index,
+                                  balance_end_real
+                             FROM account_bank_statement
+                            WHERE journal_id = journal.id
+                              AND company_id = 1
+                         ORDER BY date DESC, id DESC
+                            LIMIT 1
+                   ) statement ON TRUE
+         LEFT JOIN LATERAL (  -- sum all the lines not linked to a statement with a higher index than the last line of the statement
+                           SELECT COALESCE(SUM(stl.amount), 0.0) AS amount,
+                                  COUNT(*)
+                             FROM account_bank_statement_line stl
+                             JOIN account_move move ON move.id = stl.move_id
+                            WHERE stl.statement_id IS NULL
+                              AND move.date < %(on_date)s
+                              AND move.state != 'cancel'
+                              AND stl.journal_id = journal.id
+                              AND stl.company_id = 1
+                              AND stl.internal_index >= COALESCE(statement.first_line_index, '')
+                            LIMIT 1
+                   ) without_statement ON TRUE
+             WHERE journal.id = ANY(%(journals)s)
+			 
+        """, params)
+        query_res = {res['journal_id']: res for res in self.env.cr.dictfetchall()}
+        result = {}
+        for journal in self.journals:
+            journal_vals = query_res[journal.id]
+            result[journal.id] = (
+                bool(journal_vals['statement_id'] or journal_vals['unlinked_count']),
+                journal_vals['balance_end_real'] + journal_vals['unlinked_amount'],
+            )
+        return result
+
     def get_balance(self,journals,date_end=None):
         domain=[('journal_id', '=', journals),('account_id.account_type','=','asset_cash')]
         if date_end != None:
@@ -146,6 +208,7 @@ class DailyStatementWizard(models.TransientModel):
               JOIN account_journal journal ON move.journal_id = journal.id
              WHERE payment.is_matched IS False
                AND move.state = 'posted'
+               and move.date < %(on_date)s
                AND payment.journal_id = ANY(%s)
                AND payment.company_id = ANY(%s)
                AND payment.outstanding_account_id = journal.suspense_account_id
@@ -174,8 +237,20 @@ class DailyStatementWizard(models.TransientModel):
 
     def _get_direct_bank_payments(self, date=None, including=False):
         journals = self.env['account.journal'].search([('type', 'in', ('bank', 'cash', 'credit'))])
+        if not date:
+            date = fields.Date.context_today(self)
+
+        if including:
+            date=datetime.today() + timedelta(days=1)
+        params = {
+            'on_date': date,
+            'journals': journals.ids,
+            'companies': self.env.companies.ids,
+        }
+
         query = """
-            SELECT move.journal_id AS journal_id,
+            
+SELECT move.journal_id AS journal_id,
                    move.company_id AS company_id,
                    move.currency_id AS currency,
                    SUM(CASE
@@ -188,21 +263,14 @@ class DailyStatementWizard(models.TransientModel):
               JOIN account_journal journal ON move.journal_id = journal.id
              WHERE payment.is_matched IS TRUE
                AND move.state = 'posted'
-               AND payment.journal_id = ANY(%s)
-               AND payment.company_id = ANY(%s)
+               AND payment.journal_id = ANY(%(journals)s)
+               AND payment.company_id = ANY(%(companies)s)
+               and move.date < %(on_date)s
                AND payment.outstanding_account_id = journal.default_account_id
+          GROUP BY move.company_id, move.journal_id, move.currency_id
         """
 
-        params = [journals.ids, self.env.companies.ids]
 
-        if date:
-            if including:
-                query += " AND move.date <= %s"
-            else:
-                query += " AND move.date < %s"
-            params.append(date)
-
-        query += " GROUP BY move.company_id, move.journal_id, move.currency_id"
 
         self.env.cr.execute(query, params)
         query_result = group_by_journal(self.env.cr.dictfetchall())

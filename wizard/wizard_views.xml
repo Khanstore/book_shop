@@ -50,6 +50,10 @@
                         <field name="payment_new">
                             <list>
                                 <field name="name"/>
+                                <field name="partner_id"/>
+                                <field name="partner_balance"/>
+                                <field name="amount"/>
+                                <field name="payment_type"/>
                             </list>
                         </field>
                         <field name="journals">
