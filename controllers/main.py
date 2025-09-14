@@ -1,4 +1,6 @@
 # controllers/main.py
+from unicodedata import category
+
 from odoo import http
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import pager as portal_pager
@@ -8,10 +10,20 @@ from odoo.addons.website.controllers.main import Home  # Inherit from Website co
 
 
 class CustomWebsiteController(Home):
-    @http.route('/custom/page', type='http', auth='public', website=True)
+    @http.route('/home', type='http', auth='public', website=True)
     def custom_page(self, **kw):
-        categories= request.env['product.category'].sudo().search([], order='name asc')
+        categories= request.env['product.public.category'].sudo().search([('parent_id','=',False)], order='name asc')
         return request.render('book_shop.custom_page_templates', {"categories":categories})
+
+    @http.route('/home/category/<int:category>', type='http', auth='public', website=True)
+    def category_page(self, **kw):
+        category=request.env['product.public.category'].sudo().search([('id','=',kw['category'])])
+        if not category:
+            return self.custom_page()
+        else:
+            categories= request.env['product.public.category'].search([('parent_id','=',category.id)])
+            products = request.env['product.template'].sudo().search([('public_categ_ids', '=', category.id),('is_published','=',True)], order='name asc')
+            return request.render('book_shop.category_page_templates', {"category":category, "products": products})
 
     @http.route([
         '/website/search',

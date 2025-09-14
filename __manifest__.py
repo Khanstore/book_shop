@@ -55,6 +55,8 @@ governements, etc.)
             'book_shop/static/src/xml/pos_product_card.xml',
             ],
         'web.assets_frontend': [
+            'book_shop/static/src/css/website.css',  # Include your css file here
+            'book_shop/static/src/css/report_style.scss',  # Include your css file here
             'book_shop/static/src/js/product_pages.js',  # Include your JS file here
         ],
         },

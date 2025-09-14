@@ -2,296 +2,574 @@
 <odoo>
     <data>
         <template id="daily_admin_report_sales">
-            <h4>Sales</h4>
-            <div class="row">
-                <div class="col-1">Date</div>
-                <div class="col-1">Order No</div>
-                <div class="col-1">Partner</div>
-                <div class="col-1">State</div>
-                <div class="col-1">amount</div>
-            </div>
-            <t t-set="total_sales" t-value="0.0"/>
-            <t t-foreach="docs.sales_new" t-as="sale">
-                <div class="row">
-                    <div class="col-1">
-                        <t t-esc="sale.date_order"/>
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="sale.name"/>
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="sale.partner_id.name"/>
-                        (<t t-esc="sale.partner_id.total_balance"/>)
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="sale.state"/>
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="sale.amount_total"/>
-                    </div>
-                </div>
-                <t t-set="total_sales" t-value="total_sales+sale.amount_total"/>
-                <t t-if="docs.mode=='long'">
-                    <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-1">Product</div>
-                        <div class="col-1">Qty</div>
-                        <div class="col-1">Rate</div>
-                        <div class="col-1">tax</div>
-                        <div class="col-1">Total</div>
-                    </div>
-                    <t t-foreach="sale.order_line" t-as="line">
-                        <div class="row">
-                            <div class="col-1"></div>
-                            <div class="col-1">
-                                <t t-esc="line.product_id.name"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.product_uom_qty"/>
-                                <t t-esc="line.product_uom.name"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_unit"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_tax"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_total"/>
-                            </div>
-                        </div>
-                    </t>
-                </t>
-            </t>
-            <div class="row">
-                <div class="col-1">Total</div>
-                <div class="col-1"></div>
-                <div class="col-1"></div>
-                <div class="col-1"></div>
-                <div class="col-1">
-                    <t t-esc="total_sales"/>
-                </div>
-            </div>
+            <div class="section-title">Sales</div>
+            <table class="bordered-table">
+                <thead>
+                    <tr>
+                        <t t-if="docs.date_start!=docs.date_end">
+                            <th>Date</th>
+                        </t>
+                        <th>Order No</th>
+                        <th>Partner</th>
+                        <th>State</th>
+                        <th>amount</th>
+                    </tr>
 
+                </thead>
+                <tbody>
 
+                    <t t-set="total_sales" t-value="0.0"/>
+                    <tr t-foreach="docs.sales_new" t-as="sale">
+                        <t t-if="docs.date_start!=docs.date_end">
+                            <td>
+                            <t t-esc="sale.date_order"/>
+                            </td>
+                        </t>
+                        <td>
+                            <t t-esc="sale.name"/>
+                        </td>
+                        <td>
+                            <t t-esc="sale.partner_id.name"/>
+                            (<t t-esc="sale.partner_id.total_balance"/>)
+                        </td>
+                        <td>
+                            <t t-esc="sale.state"/>
+                        </td>
+                        <td>
+                            <t t-esc="sale.amount_total"/>
+                        </td>
+                        <t t-set="total_sales" t-value="total_sales+sale.amount_total"/>
+                        <t t-if="docs.mode=='long'">
+                            <div class="row">
+                                <div></div>
+                                <div>Product</div>
+                                <div>Qty</div>
+                                <div>Rate</div>
+                                <div>tax</div>
+                                <div>Total</div>
+                            </div>
+                            <t t-foreach="sale.order_line" t-as="line">
+                                <div class="row">
+                                    <div></div>
+                                    <div>
+                                        <t t-esc="line.product_id.name"/>
+                                    </div>
+                                    <div>
+                                        <t t-esc="line.product_uom_qty"/>
+                                        <t t-esc="line.product_uom.name"/>
+                                    </div>
+                                    <div>
+                                        <t t-esc="line.price_unit"/>
+                                    </div>
+                                    <div>
+                                        <t t-esc="line.price_tax"/>
+                                    </div>
+                                    <div>
+                                        <t t-esc="line.price_total"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </t>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+
+                        <td>Total</td>
+                        <t t-if="docs.date_start!=docs.date_end">
+                            <th></th>
+                        </t>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <t t-esc="total_sales"/>
+                        </td>
+                    </tr>
+                </tfoot>
+
+            </table>
         </template>
+
         <template id="daily_admin_report_quote">
-            <h4>Quotations</h4>
-            <div class="row">
-                <div class="col-1">Order No</div>
-                <div class="col-1">Partner</div>
-                <div class="col-1">State</div>
-                <div class="col-1">amount</div>
-            </div>
-            <t t-foreach="docs.quote_new" t-as="quote">
-                <div class="row">
-                    <div class="col-1">
-                        <t t-esc="quote.name"/>
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="quote.partner_id.name"/>
-                        (<t t-esc="quote.partner_id.total_balance"/>)
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="quote.state"/>
-                    </div>
-                    <div class="col-1">
-                        <t t-esc="quote.amount_total"/>
-                    </div>
-                </div>
-                <t t-if="docs.mode=='long'">
-                    <div class="row">
-                        <div class="col-1"></div>
-                        <div class="col-1">Product</div>
-                        <div class="col-1">Qty</div>
-                        <div class="col-1">Rate</div>
-                        <div class="col-1">tax</div>
-                        <div class="col-1">Total</div>
-                    </div>
-                    <t t-foreach="quote.order_line" t-as="line">
-                        <div class="row">
-                            <div class="col-1"></div>
-                            <div class="col-1">
-                                <t t-esc="line.product_id.name"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.product_uom_qty"/>
-                                <t t-esc="line.product_uom.name"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_unit"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_tax"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="line.price_total"/>
-                            </div>
-                        </div>
+            <table class="bordered-table">Quotations
+            <thead>
+                <tr>
+                    <t t-if="docs.date_start!=docs.date_end">
+                        <td>Date</td>
                     </t>
-                </t>
-            </t>
+                <td>Order No</td>
+                <td>Partner</td>
+                <td>State</td>
+                <td>amount</td>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr t-foreach="docs.quote_new" t-as="quote">
+                     <t t-if="docs.date_start!=docs.date_end">
+                        <td>
+                            <t t-esc="quote.date_order"/>
+                        </td>
+                    </t>
+
+                         <td>
+                            <t t-esc="quote.name"/>
+                        </td>
+                        <td>
+                            <t t-esc="quote.partner_id.name"/>
+                            (<t t-esc="quote.partner_id.total_balance"/>)
+                        </td>
+                        <td>
+                            <t t-esc="quote.state"/>
+                        </td>
+                        <td>
+                            <t t-esc="quote.amount_total"/>
+                        </td>
+                    <t t-if="docs.mode=='long'">
+                        <div class="row">
+                            <div></div>
+                            <div>Product</div>
+                            <div>Qty</div>
+                            <div>Rate</div>
+                            <div>tax</div>
+                            <div>Total</div>
+                        </div>
+                        <t t-foreach="quote.order_line" t-as="line">
+                            <div class="row">
+                                <div></div>
+                                <div>
+                                    <t t-esc="line.product_id.name"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.product_uom_qty"/>
+                                    <t t-esc="line.product_uom.name"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_unit"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_tax"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_total"/>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </tr>
+            </tbody>
+
+            </table>
+        </template>
 
 
+        <template id="daily_purchase">
+            <table class="bordered-table">Purchase
+            <thead>
+                <tr>
+                    <t t-if="docs.date_start!=docs.date_end">
+                        <td>Date</td>
+                    </t>
+                <td>Order No</td>
+                <td>Partner</td>
+                <td>State</td>
+                <td>amount</td>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr t-foreach="docs.purchase_new" t-as="purchase">
+                     <t t-if="docs.date_start!=docs.date_end">
+                        <td>
+                            <t t-esc="purchase.date_order"/>
+                        </td>
+                    </t>
+
+                         <td>
+                            <t t-esc="purchase.name"/>
+                        </td>
+                        <td>
+                            <t t-esc="purchase.partner_id.name"/>
+                            (<t t-esc="purchase.partner_id.total_balance"/>)
+                        </td>
+                        <td>
+                            <t t-esc="purchase.state"/>
+                        </td>
+                        <td>
+                            <t t-esc="purchase.amount_total"/>
+                        </td>
+                    <t t-if="docs.mode=='long'">
+                        <div class="row">
+                            <div></div>
+                            <div>Product</div>
+                            <div>Qty</div>
+                            <div>Rate</div>
+                            <div>tax</div>
+                            <div>Total</div>
+                        </div>
+                        <t t-foreach="purchase.order_line" t-as="line">
+                            <div class="row">
+                                <div></div>
+                                <div>
+                                    <t t-esc="line.product_id.name"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.product_uom_qty"/>
+                                    <t t-esc="line.product_uom.name"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_unit"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_tax"/>
+                                </div>
+                                <div>
+                                    <t t-esc="line.price_total"/>
+                                </div>
+                            </div>
+                        </t>
+                    </t>
+                </tr>
+            </tbody>
+
+            </table>
+        </template>
+        <template id="daily_admin_done_payment">
+            <table class="bordered-table">confirmed Payments
+                <thead>
+                    <tr >
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Partner</th>
+                        <th>State</th>
+                        <th>Journal</th>
+                        <th>Reference</th>
+                        <th>Memo</th>
+                        <th>Credit</th>
+                        <th>Debit</th>
+                    </tr>
+                </thead>
+                        <t t-set="total_credit" t-value="0.0"/>
+                        <t t-set="total_debit" t-value="0.0"/>
+                        <tr t-foreach="docs.payment_new.filtered(lambda p: p.state == 'paid')" t-as="payment">
+<!--                        <tr t-foreach="docs.payment_new" t-as="payment">-->
+                                <td>
+                                    <t t-esc="payment.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.date"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.partner_id.name"/>
+                                    (<t t-esc="payment.partner_id.total_balance"/>)
+                                </td>
+                                <td>
+                                    <t t-esc="payment.state"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.journal_id.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.memo"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.payment_reference"/>
+                                </td>
+                                <t t-if="payment.payment_type=='inbound'">
+                                    <td>
+                                        <t t-esc="payment.amount"/>
+                                        <t t-set="total_credit" t-value="total_credit+payment.amount"/>
+                                    </td>
+                                    <td>
+                                        0.00
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td>
+                                        0.00
+                                    </td>
+                                    <td>
+
+                                        <t t-set="total_debit" t-value="total_debit+payment.amount"/>
+                                        <t t-esc="payment.amount"/>
+                                    </td>
+                                </t>
+
+                        </tr>
+                        <tfoot>
+                            <tr>
+
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Difference</td>
+                            <td>
+                                <t t-esc="total_credit-total_debit"/>
+                            </td>
+                            <td></td>
+                            <td>
+                                <t t-esc="total_credit"/>
+                            </td>
+                            <td>
+                                <t t-esc="total_debit"/>
+                            </td>
+                            </tr>
+                        </tfoot>
+            </table>
+        </template>
+        <template id="daily_admin_pending_payment">
+            <table class="bordered-table">Pending Payments
+                <thead>
+                    <tr >
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Partner</th>
+                        <th>State</th>
+                        <th>Journal</th>
+                        <th>Reference</th>
+                        <th>Memo</th>
+                        <th>Credit</th>
+                        <th>Debit</th>
+                    </tr>
+                </thead>
+                        <t t-set="total_credit" t-value="0.0"/>
+                        <t t-set="total_debit" t-value="0.0"/>
+                        <tr t-foreach="docs.payment_new.filtered(lambda p: p.state != 'paid')" t-as="payment">
+<!--                        <tr t-foreach="docs.payment_new" t-as="payment">-->
+                                <td>
+                                    <t t-esc="payment.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.date"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.partner_id.name"/>
+                                    (<t t-esc="payment.partner_id.total_balance"/>)
+                                </td>
+                                <td>
+                                    <t t-esc="payment.state"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.journal_id.name"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.memo"/>
+                                </td>
+                                <td>
+                                    <t t-esc="payment.payment_reference"/>
+                                </td>
+                                <t t-if="payment.payment_type=='inbound'">
+                                    <td>
+                                        <t t-esc="payment.amount"/>
+                                        <t t-set="total_credit" t-value="total_credit+payment.amount"/>
+                                    </td>
+                                    <td>
+                                        0.00
+                                    </td>
+                                </t>
+                                <t t-else="">
+                                    <td>
+                                        0.00
+                                    </td>
+                                    <td>
+
+                                        <t t-set="total_debit" t-value="total_debit+payment.amount"/>
+                                        <t t-esc="payment.amount"/>
+                                    </td>
+                                </t>
+
+                        </tr>
+                        <tfoot>
+                            <tr>
+
+                            <td>Total</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>Difference</td>
+                            <td>
+                                <t t-esc="total_credit-total_debit"/>
+                            </td>
+                            <td></td>
+                            <td>
+                                <t t-esc="total_credit"/>
+                            </td>
+                            <td>
+                                <t t-esc="total_debit"/>
+                            </td>
+                            </tr>
+                        </tfoot>
+            </table>
+        </template>
+        <template id="daily_admin_report_journal">
+            <table class="bordered-table">Balance
+                        <thead>
+                            <tr>
+                            <td>Journal</td>
+                            <td class="col-1 text-center">Opening Balance</td>
+                            <td class="col-1 text-center">closing Balance</td>
+                            <td class="col-1 text-center">Change</td>
+                            </tr>
+                        </thead>
+
+                        <!--                        Todo journal Balance=direct_payment+running_balance-->
+                        <t t-set="starting_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_start)"/>
+                        <t t-set="starting_running_balance"   t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_start)"/>
+
+                        <t t-set="ending_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_end,True)"/>
+                        <t t-set="ending_running_balance"   t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_end ,True)"/>
+                        <t t-set="starting_balance_total" t-value="0.0"/>
+                        <t t-set="ending_balance_total" t-value="0.0"/>
+                        <t t-set="changing_balance_total" t-value="0.0"/>
+
+                        <tbody>
+
+                            <tr t-foreach="docs.journals" t-as="journal">
+
+                                    <td>
+                                        <t t-esc="journal.name"/>
+                                    </td>
+                                    <td>
+                                        <t t-set="starting_balance"
+                                           t-value="starting_direct_payment[journal.id][1]+ starting_running_balance[journal.id][1]"/>
+                                        <t t-esc="starting_balance"/>
+                                        <t t-set="starting_balance_total"
+                                           t-value="starting_balance_total+starting_balance"/>
+                                    </td>
+
+
+                                    <td>
+                                        <t t-set="ending_balance"
+                                           t-value="ending_direct_payment[journal.id][1]+ ending_running_balance[journal.id][1]"/>
+                                        <t t-esc="ending_balance"/>
+                                        <t t-set="ending_balance_total" t-value="ending_balance_total+ending_balance"/>
+                                    </td>
+                                    <td>
+                                        <t t-set="changing_balance" t-value="ending_balance-starting_balance"/>
+                                        <t t-esc="changing_balance"/>
+                                        <t t-set="changing_balance_total"
+                                           t-value="changing_balance_total+changing_balance"/>
+                                    </td>
+                            </tr>
+                        </tbody>
+                <tfoot>
+
+                    <tr >
+                        <td>Total</td>
+                        <td class="col-1 text-end">
+                            <t t-esc="starting_balance_total"/>
+                        </td>
+                        <td class="col-1 text-end">
+                            <t t-esc="ending_balance_total"/>
+                        </td>
+                        <td class="col-1 text-end">
+                            <t t-esc="changing_balance_total"/>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </template>
 
         <template id="daily_admin_report">
             <t t-call="web.html_container">
                 <t t-call="web.internal_layout">
+                    <style>
+                        /* General layout */
+                        body {
+                        font-family: 'Lato', sans-serif;
+                        font-size: 12px;
+                        color: #333;
+                        margin: 0;
+                        padding: 0;
+                        }
+
+                        /* Header and footer */
+                        .header, .footer {
+                        text-align: center;
+                        font-size: 10px;
+                        color: #777;
+                        padding: 0px 0;
+                        border-bottom: 1px solid #ccc;
+                        }
+
+                        /* Table styling */
+                        table.bordered-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                        }
+
+                        table.bordered-table th, table.bordered-table td {
+                        border: 1px solid #ccc;
+                        padding: 6px;
+                        text-align: left;
+                        }
+
+                        table.bordered-table th {
+                        background-color: #f2f2f2;
+                        font-weight: bold;
+                        }
+
+                        /* Row striping */
+                        table.bordered-table tr:nth-child(even) {
+                        background-color: #fafafa;
+                        }
+
+                        /* Section titles */
+                        .section-title {
+                        font-size: 14px;
+                        font-weight: bold;
+                        margin-top: 20px;
+                        margin-bottom: 10px;
+                        color: #2E86C1;
+                        }
+
+                        /* Totals and summary */
+                        .total-line {
+                        font-weight: bold;
+                        text-align: right;
+                        padding-top: 10px;
+                        }
+
+                        /* Optional Bengali font integration */
+                        @font-face {
+                        font-family: 'SolaimanLipi';
+                        src: url('/your/path/SolaimanLipi.ttf') format('truetype');
+                        }
+
+                        .bengali-text {
+                        font-family: 'SolaimanLipi', sans-serif;
+                        font-size: 13px;
+                        }
+
+                    </style>
+
                     <div class="page">
-                        <h3 class="mb32">Daily Report</h3>
-                        <h5>from
-                            <t t-esc="docs.date_start"/>
-                            to
-                            <t t-esc="docs.date_end"/>
-                        </h5>
+
+                        <h3 class="mb32  header">Daily Report</h3>
+                        <t t-if="docs.date_start==docs.date_end">
+                            <h5><t t-esc="docs.date_start"/> </h5>
+                        </t>
+                        <t t-else="">
+                            <h5 class="header">from
+                                <t t-esc="docs.date_start"/>
+                                to
+                                <t t-esc="docs.date_end"/>
+                            </h5>
+                        </t>
                         <t t-call="book_shop.daily_admin_report_sales"/>
 
                         <t t-call="book_shop.daily_admin_report_quote"/>
+                        <t t-call="book_shop.daily_purchase"/>
+                        <t t-call="book_shop.daily_admin_done_payment"/>
+                        <t t-call="book_shop.daily_admin_pending_payment"/>
 
-                        <h4>payments</h4>
-                        <div class="row">
-                            <div class="col-1">Name</div>
-                            <div class="col-1">Date</div>
-                            <div class="col-1">Partner</div>
-                            <div class="col-1">State</div>
-                            <div class="col-1">Journal</div>
-                            <div class="col-1">Reference</div>
-                            <div class="col-1">Memo</div>
-                            <div class="col-1">Credit</div>
-                            <div class="col-1">Debit</div>
-                        </div>
-                        <t t-set="total_credit" t-value="0.0"/>
-                        <t t-set="total_debit" t-value="0.0"/>
-                        <t t-foreach="docs.payment_new" t-as="payment">
-                            <div class="row">
-                                <div class="col-1">
-                                    <t t-esc="payment.name"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.date"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.partner_id.name"/>
-                                    (<t t-esc="payment.partner_id.total_balance"/>)
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.state"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.journal_id.name"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.memo"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-esc="payment.payment_reference"/>
-                                </div>
-                                <t t-if="payment.payment_type=='inbound'">
-                                    <div class="col-1">
-                                        <t t-esc="payment.amount"/>
-                                        <t t-set="total_credit" t-value="total_credit+payment.amount"/>
-                                    </div>
-                                    <div class="col-1">
-                                        0.00
-                                    </div>
-                                </t>
-                                <t t-else="">
-                                    <div class="col-1">
-                                        0.00
-                                    </div>
-                                    <div class="col-1">
-
-                                        <t t-set="total_debit" t-value="total_debit+payment.amount"/>
-                                        <t t-esc="payment.amount"/>
-                                    </div>
-                                </t>
-                            </div>
-
-                        </t>
-                        <div class="row">
-                            <div class="col-1">Total</div>
-                            <div class="col-1"></div>
-                            <div class="col-1"></div>
-                            <div class="col-1"></div>
-                            <div class="col-1">Difference</div>
-                            <div class="col-1">
-                                <t t-esc="total_credit-total_debit"/>
-                            </div>
-                            <div class="col-1"></div>
-                            <div class="col-1">
-                                <t t-esc="total_credit"/>
-                            </div>
-                            <div class="col-1">
-                                <t t-esc="total_debit"/>
-                            </div>
-                        </div>
-                        <h4>Balance</h4>
-                        <div class="row">
-                            <div class="col-1">Journal</div>
-                            <div class="col-1 text-center">Opening Balance</div>
-                            <div class="col-1 text-center">closing Balance</div>
-                            <div class="col-1 text-center">Change</div>
-                        </div>
-
-                        <!--                        Todo journal Balance=direct_payment+running_balance-->
-                        <t t-set="starting_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_start)"/>
-                        <t t-set="starting_running_balance"
-                           t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_start)"/>
-
-                        <t t-set="ending_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_end,True)"/>
-                        <t t-set="ending_running_balance"
-                           t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_end ,True)"/>
-                        <t t-set="starting_balance_total" t-value="0.0"/>
-                        <t t-set="ending_balance_total" t-value="0.0"/>
-                        <t t-set="changing_balance_total" t-value="0.0"/>
-
-
-                        <t t-foreach="docs.journals" t-as="journal">
-                            <div class="row">
-
-                                <div class="col-1">
-                                    <t t-esc="journal.name"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-set="starting_balance"
-                                       t-value="starting_direct_payment[journal.id][1]+ starting_running_balance[journal.id][1]"/>
-                                    <t t-esc="starting_balance"/>
-                                    <t t-set="starting_balance_total"
-                                       t-value="starting_balance_total+starting_balance"/>
-                                </div>
-
-
-                                <div class="col-1">
-                                    <t t-set="ending_balance" t-value="ending_direct_payment[journal.id][1]+ ending_running_balance[journal.id][1]"/>
-                                    <t t-esc="ending_balance"/>
-                                    <t t-set="ending_balance_total" t-value="ending_balance_total+ending_balance"/>
-                                </div>
-                                <div class="col-1">
-                                    <t t-set="changing_balance" t-value="ending_balance-starting_balance"/>
-                                    <t t-esc="changing_balance"/>
-                                    <t t-set="changing_balance_total" t-value="changing_balance_total+changing_balance"/>
-                                </div>
-
-                            </div>
-                        </t>
-                        <div class="row">
-                            <div class="col-1">Total</div>
-                            <div class="col-1 text-end">
-                                <t t-esc="starting_balance_total"/>
-                            </div>
-                            <div class="col-1 text-end">
-                                <t t-esc="ending_balance_total"/>
-                            </div>
-                            <div class="col-1 text-end">
-                                <t t-esc="changing_balance_total"/>
-                            </div>
-                        </div>
+                        <t t-call="book_shop.daily_admin_report_journal"/>
                     </div>
                 </t>
             </t>
         </template>
-
 
 
         <record id="report_daily_admin_report" model="ir.actions.report">

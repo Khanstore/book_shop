@@ -37,14 +37,13 @@ class DailyStatementWizard(models.TransientModel):
     _description ='Create a statement which reflects every action or change in certain date'
 
     name =fields.Char("Daily Administrative Statement")
-    date_start =fields.Date("Start",default=lambda self: datetime.today().date() - timedelta(days=1))
+    date_start =fields.Date("Start",default=lambda self: datetime.today().date() )
     date_end =fields.Date("Up to",default=fields.Date.today)
     mode=fields.Selection(string='Report mode',
         selection=[('short', 'Short'), ('long', 'Long')],
         default="short")
     sales_new =fields.Many2many(comodel_name='sale.order' ,string='Sales' ,compute='get_sales_new')
     quote_new =fields.Many2many(comodel_name='sale.order' ,string='Quotation' ,compute='get_quote_new')
-    purchase_new =fields.Many2many(comodel_name='purchase.order' ,string='Purchase' ,compute='get_purchase_new')
     purchase_new =fields.Many2many(comodel_name='purchase.order' ,string='Purchase' ,compute='get_purchase_new')
     payment_new =fields.Many2many(comodel_name='account.payment' ,string='Payments' ,compute='get_payment_new')
     # sales_edit =fields.Many2many(comodel_name='sale.order' ,string='sales' ,compute='get_sales_edit')
@@ -130,7 +129,7 @@ class DailyStatementWizard(models.TransientModel):
                              JOIN account_move move ON move.id = stl.move_id
                             WHERE stl.statement_id IS NULL
                               AND move.date < %(on_date)s
-                              AND move.state != 'cancel'
+                              AND move.state != 'posted'
                               AND stl.journal_id = journal.id
                               AND stl.company_id = 1
                               AND stl.internal_index >= COALESCE(statement.first_line_index, '')
@@ -250,7 +249,7 @@ class DailyStatementWizard(models.TransientModel):
 
         query = """
             
-SELECT move.journal_id AS journal_id,
+            SELECT move.journal_id AS journal_id,
                    move.company_id AS company_id,
                    move.currency_id AS currency,
                    SUM(CASE
