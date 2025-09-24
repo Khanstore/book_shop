@@ -94,6 +94,16 @@ function updatePages(productId) {
             bindingDiv.style.display = 'none';
         }
 
+//    code to show ecomerce_description
+        const description = result.result?.description ?? 0;
+        console.log("📘 description received:", binding);
+        const desc_el = document.querySelector('div.oe_structure[data-oe-model="product.template"][data-oe-field="description_ecommerce"]');
+
+
+
+        desc_el.innerHTML= description;
+
+
 
 
         //    code to show page

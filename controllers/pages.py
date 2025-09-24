@@ -21,4 +21,6 @@ class ProductVariantPages(http.Controller):
             'edition':product.last_edition,
             'binding': product.binding_type.name if product.binding_type else '',
             'paper': paper,
-            'pages': product.pages or 0}
+            'pages': product.pages or 0,
+            'description': product.description_ecommerce,
+            }
