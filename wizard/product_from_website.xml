@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="import_product_from_website_wizard" model="ir.ui.view">
+            <field name="name">book.shop.import.product.website.view</field>
+            <field name="model">import.product.from.website</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+
+                        <group>
+                            <field name="source_url"/>
+                            <field name="target_url"/>
+                            <button string="Fetch Data" type="object" name="fetch_data" class="btn-primary"/>
+                        </group>
+                        <group>
+                            <field name="product_name"/>
+<!--                            <field name="categ_id"/>-->
+                            <field name="stock_qty"/>
+                            <field name="image_url"/>
+                            <field name="ecommerce_description"/>
+                            <field name="face_value"/>
+                            <field name="price"/>
+                            <field name="pages"/>
+                            <field name="editions"/>
+                            <field name="isbn"/>
+                            <field name="publication_date"/>
+
+                        </group>
+                        <button string="Import Product" type="object" name="create_product" class="btn-primary"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id ="action_product_from_website_wizard" model="ir.actions.act_window">
+            <field name="name">Import Product</field>
+            <field name="res_model">import.product.from.website</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="import_product_from_website_wizard"/>
+            <field name="target">current</field>
+        </record>
+    </data>
+
+</odoo>

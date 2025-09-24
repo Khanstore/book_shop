@@ -15,7 +15,7 @@ governements, etc.)
     'depends' : ['base','website_sale','website','stock','product','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',
     'application': False,
-    'post_init_hook': 'cleanup_old_data',
+    # 'post_init_hook': 'cleanup_old_data',
 
     'data': [
         'security/ir.model.access.csv',
@@ -41,6 +41,7 @@ governements, etc.)
         'reports/sale_order.xml',
         'data/book_shop_pages.xml',
         'wizard/wizard_views.xml',
+        'wizard/product_from_website.xml',
         'reports/daily_admin_report.xml',
         'reports/stock_piking.xml',
         'views/khan_store_page.xml',
