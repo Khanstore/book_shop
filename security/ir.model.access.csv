@@ -10,3 +10,4 @@ book_shop.access_picking_confirmation_wizard_public,access_picking_confirmation_
 book_shop.access_picking_confirmation_wizard_user,access_picking_confirmation_wizard_user,book_shop.model_picking_confirmation_wizard,base.group_user,1,1,1,0
 book_shop.access_book_shop_daily_statement,access_book_shop_daily_statement,book_shop.model_book_shop_daily_statement,base.group_user,1,1,1,1
 book_shop.access_res_thana,access_res_thana,book_shop.model_res_thana,base.group_user,1,0,0,0
+book_shop.access_dev_todo,access_dev_todo,book_shop.model_dev_todo,base.group_user,1,1,1,0

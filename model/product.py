@@ -49,10 +49,14 @@ class ProductTemplate(models.Model):
     height=fields.Float("Height")
     width=fields.Float("Width")
 
+
+
     def write(self, vals):
         res = super().write(vals)
         for template in self:
             if len(template.product_variant_ids) == 1:
+                if 'list_price' in vals:
+                    template.product_variant_id.list_price = vals['list_price']
                 variant = template.product_variant_ids[0]
                 if not self.env.context.get('sync_from_variant'):
                     update_vals = {}

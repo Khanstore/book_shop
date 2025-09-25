@@ -8,6 +8,11 @@ import time
 from urllib.parse import urlparse
 from odoo import models, fields, api
 
+class ProductTemplate(models.Model):
+    _inherit='product.template'
+
+    publisher_link=fields.Char("publisher link")
+
 class importProductFromWebsite(models.TransientModel):
     _name = 'import.product.from.website'
     _description = 'import product from website'
@@ -26,6 +31,7 @@ class importProductFromWebsite(models.TransientModel):
     pages = fields.Integer(string="Pages")
     editions = fields.Char(string="Editions")
     publication_date = fields.Char(string="Publication Date")
+    # weight=fields.Float("weight")
 
     def fetch_data(self):
         url= urlparse(self.source_url)
@@ -107,11 +113,145 @@ class importProductFromWebsite(models.TransientModel):
         driver.quit()
 
 
+    def khoshrozltd_products(self):
+        url = self.source_url
+        driver = webdriver.Chrome()  # or webdriver.Firefox()
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        time.sleep(3)  # wait for Angular to load content
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        stock_div = soup.find("span", id="available-quantity")
+
+        if stock_div:
+            stock_text = stock_div.get_text(strip=True)
+            self.stock_qty=int(stock_text)
+        name_div = soup.find("h1", class_="mb-2 fs-20 fw-600")
+        if name_div:
+            self.product_name=name_div.get_text(strip=True)
+        price_div = soup.find("div", class_="fs-16 opacity-60")
+        if price_div:
+            price_text = price_div.get_text(strip=True)
+            match = re.search(r"[\d.]+", price_text)
+            if match:
+                price = float(match.group())
+            self.face_value = price
+        price_div = soup.find("strong", class_="h4 fw-700 text-primary")
+        if price_div:
+            price_text = price_div.get_text(strip=True)
+            match = re.search(r"[\d.]+", price_text)
+            if match:
+                price = float(match.group())
+            self.price = price
+
+        description_div = soup.find("div", class_="mw-100 text-left")
+        if description_div:
+            self.ecommerce_description=description_div.decode_contents() # decode_context() get the inner html
+
+        img_tag = soup.find("img",role="presentation")
+
+        if img_tag and img_tag.has_attr("src"):
+            self.image_url = img_tag["src"]
+
+        desc_button = wait.until(EC.presence_of_element_located((By.XPATH, '//a[contains(text(), "Specification ")]')))
+        driver.execute_script("arguments[0].click();", desc_button)
+
+        time.sleep(2)  # allow Angular to load content
+
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+
+        isbn_td = None
+        for row in soup.select("#spec-table tr"):
+            cells = row.find_all("td")
+            print(cells[0].get_text(strip=True).lower())
+            if len(cells) == 2 and "isbn" in cells[0].get_text(strip=True).lower():
+                self.isbn = cells[1].get_text(strip=True)
+            if len(cells) == 2 and "Number of Pages" in cells[0].get_text(strip=True):
+                self.pages = cells[1].get_text(strip=True)
+
+            if len(cells) == 2 and "Number of Pages" in cells[0].get_text(strip=True):
+                self.pages = cells[1].get_text(strip=True)
+
+        #     if th and "Publish" in th.get_text(strip=True):
+        #         self.publication_date = td.get_text(strip=True)
+        #     if th and "Title" in th.get_text(strip=True):
+        #         self.product_name = td.get_text(strip=True)
+        #
+
+
+
+        driver.quit()
+
+    def rokomari_products(self):
+        url = self.source_url
+        driver = webdriver.Chrome()  # or webdriver.Firefox()
+        driver.get(url)
+        wait = WebDriverWait(driver, 10)
+        time.sleep(3)  # wait for Angular to load content
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+        stock_div = soup.find("span", id="available-quantity")
+
+        if stock_div:
+            stock_text = stock_div.get_text(strip=True)
+            self.stock_qty=int(stock_text)
+        name_div = soup.find("h1", class_="mb-2 fs-20 fw-600")
+        if name_div:
+            self.product_name=name_div.get_text(strip=True)
+        price_div = soup.find("div", class_="fs-16 opacity-60")
+        if price_div:
+            price_text = price_div.get_text(strip=True)
+            match = re.search(r"[\d.]+", price_text)
+            if match:
+                price = float(match.group())
+            self.face_value = price
+        price_div = soup.find("del", class_="original-price")
+        if price_div:
+            price_text = price_div.get_text(strip=True)
+            number = float(price_text.split()[1])
+            self.face_value=number
+
+        description_div = soup.find("div", class_="shortSummery_summeryText__ycsRa")
+        if description_div:
+            self.ecommerce_description=description_div.decode_contents() # decode_context() get the inner html
+
+        img_tag = soup.select_one("div#ts--desktop-details-book-image-container img")
+
+        if img_tag and img_tag.has_attr("src"):
+            self.image_url = img_tag["src"]
+        # fields that is shown after pressing specification Button
+        desc_button = wait.until(EC.presence_of_element_located((By.XPATH, '//button[contains(text(), "Specification")]')))
+        driver.execute_script("arguments[0].click();", desc_button)
+
+        time.sleep(2)  # allow Angular to load content
+
+        soup = BeautifulSoup(driver.page_source, "html.parser")
+
+        isbn_td = None
+        for row in soup.select("table tr"):
+            cells = row.find_all("td")
+            if len(cells) == 2 and "isbn" in cells[0].get_text(strip=True).lower():
+                self.isbn = cells[1].get_text(strip=True)
+            if len(cells) == 2 and "Name" in cells[0].get_text(strip=True):
+                self.product_name = cells[1].get_text(strip=True)
+            if len(cells) == 2 and "Edition" in cells[0].get_text(strip=True):
+                self.publication_date = cells[1].get_text(strip=True)
+
+            if len(cells) == 2 and "No of Page" in cells[0].get_text(strip=True):
+                self.pages = cells[1].get_text(strip=True)
+
+
+
+
+
+
+        driver.quit()
+
+
     def create_product(self):
         vals={}
+        vals['publisher_link']=self.source_url
         vals['name']=self.product_name
         vals['is_storable']=True
-        vals['page']=self.pages
+        vals['pages']=self.pages
         vals['last_edition']=self.publication_date
         vals['isbn']=self.isbn
         vals['list_price']=self.face_value
@@ -131,3 +271,11 @@ class importProductFromWebsite(models.TransientModel):
             'context': self.env.context,
         }
 
+    def action_open_google_image_search(self):
+        self.ensure_one()
+        query = self.name or ""
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f"https://www.google.com/search?tbm=isch&q={query}",
+            'target': 'new',  # open in new tab
+        }

@@ -1,0 +1,32 @@
+
+DELETE FROM account_partial_reconcile;
+DELETE FROM account_move_line;
+DELETE FROM account_move;
+
+-- Delete payments
+DELETE FROM account_payment;
+
+-- Delete bank statements
+DELETE FROM account_bank_statement_line;
+DELETE FROM account_bank_statement;
+
+-- Delete invoices/bills
+DELETE FROM account_move WHERE move_type IN ('out_invoice','in_invoice','out_refund','in_refund');
+
+-- Delete POS orders
+DELETE FROM pos_payment;
+DELETE FROM pos_order;
+--change invoice status of sales
+UPDATE public.sale_order SET
+invoice_status = 'to invoice'::character varying WHERE
+invoice_status ='invoiced';
+
+UPDATE public.sale_order_line SET
+invoice_status='to_invoice' ,
+qty_invoiced=0,
+qty_to_invoice = product_uom_qty WHERE
+invoice_status='invoiced';
+
+update public.purchase_order set invoice_count=0,invoice_status='to invoice';
+
+update public.purchase_order_line set qty_invoiced=0, qty_to_invoice=qty_received;

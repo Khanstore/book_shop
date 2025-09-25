@@ -21,3 +21,4 @@
 ###################################################################################
 
 from . import wizards
+from . import ProductFromWebsite

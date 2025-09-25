@@ -24,28 +24,31 @@ from . import controllers
 from . import wizard
 from . import todo_applet
 
+from odoo import api, SUPERUSER_ID
+
 def cleanup_old_data(cr, registry):
     cr.execute("""
-        delete  FROM public.mail_followers_mail_message_subtype_rel where mail_followers_id not in (select id from mail_followers);
+        DELETE FROM public.mail_followers_mail_message_subtype_rel
+        WHERE mail_followers_id NOT IN (SELECT id FROM mail_followers);
 
-        delete  FROM public.account_move_send_wizard_res_partner_rel where account_move_send_wizard_id not in (select id from account_move_send_wizard);
-        
-        delete  FROM public.account_payment_register_move_line_rel where wizard_id not in (select id from public.account_payment_register);
-        
-        delete  FROM public.documents_access where document_id not in (select id from documents_document);
-        
-        delete  FROM public.website_track where visitor_id not in (select id from website_visitor);
-        
-        delete  FROM public.discuss_channel where livechat_visitor_id not in (select id from website_visitor );
-        
-        
-        delete  FROM public.sale_advance_payment_inv_sale_order_rel;
-        
-        
-        delete  FROM public.pos_preparation_display_orderline where preparation_display_order_id not in (select id from pos_preparation_display_order);
-        
-        
-        
+        DELETE FROM public.account_move_send_wizard_res_partner_rel
+        WHERE account_move_send_wizard_id NOT IN (SELECT id FROM account_move_send_wizard);
 
-        """)
-    print("Old data cleaned up successfully.")
+        DELETE FROM public.account_payment_register_move_line_rel
+        WHERE wizard_id NOT IN (SELECT id FROM public.account_payment_register);
+
+        DELETE FROM public.documents_access
+        WHERE document_id NOT IN (SELECT id FROM documents_document);
+
+        DELETE FROM public.website_track
+        WHERE visitor_id NOT IN (SELECT id FROM website_visitor);
+
+        DELETE FROM public.discuss_channel
+        WHERE livechat_visitor_id NOT IN (SELECT id FROM website_visitor);
+
+        DELETE FROM public.sale_advance_payment_inv_sale_order_rel;
+
+        DELETE FROM public.pos_preparation_display_orderline
+        WHERE preparation_display_order_id NOT IN (SELECT id FROM pos_preparation_display_order);
+    """)
+    print("✅ Old data cleaned up successfully.")

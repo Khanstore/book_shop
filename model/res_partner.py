@@ -34,6 +34,7 @@ class Partner(models.Model):
     mobile_search = fields.Char("mobile_search", compute='prepare_phone4search',store="True")
     is_writer = fields.Boolean("Is a Writer", default=False)
     is_publisher = fields.Boolean("Is a Publisher", default=False)
+    thana_id=fields.Many2one('res.thana', "Thana")
     author_of = fields.Many2many(comodel_name="product.template",relation= 'author_book_rel',column1= "author_ids",column2= 'author_of',string="Author Of")
     publisher_of = fields.Many2many(comodel_name="product.template",relation= 'publisher_book_rel',column1= 'publisher_ids', column2='publisher_of',
                                     string="Publisher Of")

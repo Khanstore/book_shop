@@ -136,7 +136,7 @@ class DailyStatementWizard(models.TransientModel):
                             LIMIT 1
                    ) without_statement ON TRUE
              WHERE journal.id = ANY(%(journals)s)
-			 
+
         """, params)
         query_res = {res['journal_id']: res for res in self.env.cr.dictfetchall()}
         result = {}
@@ -146,6 +146,11 @@ class DailyStatementWizard(models.TransientModel):
                 bool(journal_vals['statement_id'] or journal_vals['unlinked_count']),
                 journal_vals['balance_end_real'] + journal_vals['unlinked_amount'],
             )
+
+        # pos_totals = self._get_pos_payments(date)
+        # for journal in self.journals:
+        #     if journal.id in pos_totals:
+        #         result[journal.id]=(result[journal.id][0],result[journal.id][1]+pos_totals[journal.id])
         return result
 
     def get_balance(self,journals,date_end=None):
@@ -317,6 +322,30 @@ class DailyStatementWizard(models.TransientModel):
     #         ('create_date', '<=', datetime.combine(self.date_start, datetime.min.time()))
     #     ])
     #     self.sales_edit = [(6, 0, orders.ids)]
+
+
+
+    def _get_pos_payments(self, date=None):
+        journals = self.env['account.journal'].search([('type', 'in', ('bank', 'cash'))])
+        domain = [
+            ('payment_date', '<=', date or fields.Date.today()),
+            ('payment_method_id.journal_id', 'in', journals.ids),
+            ('session_id.state', '=', 'closed'),
+        ]
+        pos_payments = self.env['pos.payment'].read_group(
+            domain,
+            ['amount:sum'],
+            ['payment_method_id']
+        )
+
+        result = {}
+        for p in pos_payments:
+            if p.get('payment_method_id'):
+                method_id = p['payment_method_id'][0]
+                method = self.env['pos.payment.method'].browse(method_id)
+                journal_id = method.journal_id.id
+                result[journal_id] = result.get(journal_id, 0.0) + p['amount']
+        return result
 
     def update_fields(self):
         self.get_sales_new()
