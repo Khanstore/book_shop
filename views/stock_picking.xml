@@ -26,5 +26,24 @@
             </form>
         </field>
     </record>
+
+        <record id="pocking_list_tracking" model="ir.ui.view">
+            <field name="name">stock.picking.view.for.tracking.number</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.vpicktree"/>
+            <field name="arch" type="xml">
+                    <xpath expr="//list" position="attributes">
+                        <attribute name="editable">top</attribute>
+                    </xpath>
+                    <field name="partner_id" position="after">
+
+
+                        <field name="date" optional="show" readonly="state in ['cancel', 'done']"/>
+                        <field name="carrier_id" optional="show" readonly="state in ['cancel', 'done']"/>
+                        <field name="carrier_tracking_ref" optional="show" readonly="state in ['cancel']"/>
+                    </field>
+            </field>
+
+        </record>
     </data>
 </odoo>
