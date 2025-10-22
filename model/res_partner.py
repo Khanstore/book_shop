@@ -47,13 +47,16 @@ class Partner(models.Model):
     #     copy=False,
     #     required=True,
     # )
+    # Fixme the following fields to refresh auto, so store=true edited
     total_balance = fields.Monetary(
         string="Total Balance",
         compute="_compute_total_balance",
         currency_field="currency_id",
+        store=False
     )
 
     # @api.depends('move_ids.amount_residual')  # Use move_ids instead of account_move_ids
+    @api.depends('total_due')
     def _compute_total_balance(self):
         for partner in self:
             # Fetch Payable and Receivable amounts

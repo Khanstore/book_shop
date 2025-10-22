@@ -12,7 +12,7 @@ governements, etc.)
     """,
     'version': '18.0.1.0.0',
     'category': 'Others',
-    'depends' : ['base','website_sale','website','stock','product','accountant','account','purchase','point_of_sale'],
+    'depends' : ['base','website_sale','website','stock','product','account_followup','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',
     'application': False,
     # 'post_init_hook': 'cleanup_old_data',
@@ -54,6 +54,9 @@ governements, etc.)
         'point_of_sale._assets_pos': [
             'book_shop/static/src/css/pos_image_fix.css',
             'book_shop/static/src/xml/pos_product_card.xml',
+            ],
+        'web.assets_backend': [
+                'book_shop/static/src/js/trim_tracking.js',
             ],
         'web.assets_frontend': [
             # 'book_shop/static/src/css/website.css',  # Include your css file here

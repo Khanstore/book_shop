@@ -90,3 +90,7 @@ class AccountPayment(models.Model):
     _inherit='account.payment'
 
     partner_balance= fields.Monetary("Partner Balance", related="partner_id.commercial_partner_id.total_balance")
+
+    def action_post(self):
+        super().action_post()
+        self.partner_id._compute_total_balance()

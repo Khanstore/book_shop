@@ -15,6 +15,10 @@ delete  FROM public.sale_advance_payment_inv_sale_order_rel;
 
 
 delete  FROM public.pos_preparation_display_orderline where preparation_display_order_id not in (select id from pos_preparation_display_order);
-
+delete  from public.account_bank_statement_line;
+delete  from public.account_bank_statement;
+delete from public.account_partial_reconcile;
+delete from public.account_move_line;
+delete from public.account_move where id not in (6);
 
 

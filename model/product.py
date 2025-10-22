@@ -49,6 +49,15 @@ class ProductTemplate(models.Model):
     height=fields.Float("Height")
     width=fields.Float("Width")
 
+    def create(self,vals):
+        res=super().create(vals)
+        product=self.env['product.product'].search([('product_tmpl_id','=',res.id)])
+        dict={}
+        for key in vals:
+            if isinstance(key, str) and key in product._fields:
+                dict[key]=vals[key]
+        product.write(dict)
+        return res
 
 
     def write(self, vals):

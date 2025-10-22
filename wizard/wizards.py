@@ -146,11 +146,6 @@ class DailyStatementWizard(models.TransientModel):
                 bool(journal_vals['statement_id'] or journal_vals['unlinked_count']),
                 journal_vals['balance_end_real'] + journal_vals['unlinked_amount'],
             )
-
-        # pos_totals = self._get_pos_payments(date)
-        # for journal in self.journals:
-        #     if journal.id in pos_totals:
-        #         result[journal.id]=(result[journal.id][0],result[journal.id][1]+pos_totals[journal.id])
         return result
 
     def get_balance(self,journals,date_end=None):
