@@ -47,3 +47,21 @@ class SaleOrder(models.Model):
         # Open the invoice record (example: returning its form view in Odoo)
 
     
+class saleOrderLine(models.Model):
+    _inherit ='sale.order.line'
+
+    partner_id = fields.Many2one('res.partner', related='order_id.partner_id', string='Partner', readonly=True,
+                                 store=True, index='btree_not_null')
+    date_order = fields.Datetime(related='order_id.date_order', string='Order Date', readonly=True)
+    date_approve = fields.Datetime(related="order_id.date_order", string='Confirmation Date', readonly=True)
+
+    def action_sale_history(self):
+        self.ensure_one()
+        action = self.env["ir.actions.actions"]._for_xml_id("book_shop.action_sale_history")
+        action['domain'] = [('state', 'in', ['sale', 'done']), ('product_id', '=', self.product_id.id)]
+        action['display_name'] = _("Sales History for %s", self.product_id.display_name)
+        action['context'] = {
+            'search_default_partner_id': self.partner_id.id
+        }
+
+        return action

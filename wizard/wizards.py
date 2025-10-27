@@ -88,6 +88,40 @@ class DailyStatementWizard(models.TransientModel):
 
 
 
+    # ✅ this function returns the payment value of a journal in dashboard
+    def _get_journal_dashboard_outstanding_payments(self,date=False):
+        journals = self.env['account.journal'].search([('type', 'in', ['bank', 'cash'])])
+        # ✅ Correct literal SQL date condition
+        if not date:
+            date = fields.Date.today()
+        date_filter = f" AND payment.date < '{date}'"
+
+        self.env.cr.execute(f"""
+            SELECT payment.journal_id AS journal_id,
+                   payment.company_id AS company_id,
+                   payment.currency_id AS currency,
+                   SUM(CASE
+                       WHEN payment.payment_type = 'outbound' THEN -payment.amount
+                       ELSE payment.amount
+                   END) AS amount_total,
+                   SUM(amount_company_currency_signed) AS amount_total_company
+              FROM account_payment payment
+              JOIN account_move move ON move.origin_payment_id = payment.id
+             WHERE (NOT payment.is_matched OR payment.is_matched IS NULL)
+               AND move.state = 'posted'
+               AND payment.journal_id = ANY(%s)
+               AND payment.company_id = ANY(%s)
+               {date_filter}
+          GROUP BY payment.company_id, payment.journal_id, payment.currency_id
+        """, [journals.ids, self.env.companies.ids])
+
+        query_result = group_by_journal(self.env.cr.dictfetchall())
+        result = {}
+        for journal in journals:
+            currency = journal.currency_id or self.env['res.currency'].browse(journal.company_id.sudo().currency_id.id)
+            result[journal.id] = self._count_results_and_sum_amounts(query_result[journal.id], currency)
+        return result
+
     def _get_journal_dashboard_bank_running_balance(self, date=None, including=False):
         # In order to not recompute everything from the start, we take the last
         # bank statement and only sum starting from there.

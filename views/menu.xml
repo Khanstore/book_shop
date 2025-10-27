@@ -1,8 +1,6 @@
 <odoo>
     <data>
 
-        <menuitem id="menu_action_account_report_cash_flow" name="Daily Admiin report" action="action_daily_admin_report"
-                  parent="account.account_reports_legal_statements_menu" groups="account.group_account_readonly"/>
 
         <menuitem id="shop_menu_root"
                   name="Shop"

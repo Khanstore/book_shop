@@ -1,0 +1,18 @@
+
+-- delete all the payment which has no journal entry
+delete from public.account_payment where move_id is NULL
+
+-- Update wrong community bank account entry for inbound payments
+-- here journal id 12 for community bank and account_id=140
+UPDATE account_move_line aml
+SET account_id = 140
+WHERE credit = 0
+  AND move_id IN (
+      SELECT move_id
+      FROM account_payment
+      WHERE payment_type = 'inbound'
+        AND journal_id = 12
+  );
+
+  UPDATE account_move_line aml
+SET account_id = 140 where debit=0 and move_id in (select move_Id from account_payment where payment_type='outbound' and journal_id=12);

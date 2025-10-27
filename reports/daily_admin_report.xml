@@ -402,6 +402,74 @@
                         </tfoot>
             </table>
         </template>
+<!--        <template id="daily_admin_report_journal">-->
+<!--            <table class="bordered-table">Balance-->
+<!--                        <thead>-->
+<!--                            <tr>-->
+<!--                            <td>Journal</td>-->
+<!--                            <td class="col-1 text-center">Opening Balance</td>-->
+<!--                            <td class="col-1 text-center">closing Balance</td>-->
+<!--                            <td class="col-1 text-center">Change</td>-->
+<!--                            </tr>-->
+<!--                        </thead>-->
+
+<!--                        &lt;!&ndash;                        Todo journal Balance=direct_payment+running_balance&ndash;&gt;-->
+<!--                        <t t-set="starting_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_start)"/>-->
+<!--                        <t t-set="starting_running_balance"   t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_start)"/>-->
+
+<!--                        <t t-set="ending_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_end,True)"/>-->
+<!--                        <t t-set="ending_running_balance"   t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_end ,True)"/>-->
+<!--                        <t t-set="starting_balance_total" t-value="0.0"/>-->
+<!--                        <t t-set="ending_balance_total" t-value="0.0"/>-->
+<!--                        <t t-set="changing_balance_total" t-value="0.0"/>-->
+
+<!--                        <tbody>-->
+
+<!--                            <tr t-foreach="docs.journals" t-as="journal">-->
+
+<!--                                    <td>-->
+<!--                                        <t t-esc="journal.name"/>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <t t-set="starting_balance"-->
+<!--                                           t-value="starting_direct_payment[journal.id][1]+ starting_running_balance[journal.id][1]"/>-->
+<!--                                        <t t-esc="starting_balance"/>-->
+<!--                                        <t t-set="starting_balance_total"-->
+<!--                                           t-value="starting_balance_total+starting_balance"/>-->
+<!--                                    </td>-->
+
+
+<!--                                    <td>-->
+<!--                                        <t t-set="ending_balance"-->
+<!--                                           t-value="ending_direct_payment[journal.id][1]+ ending_running_balance[journal.id][1]"/>-->
+<!--                                        <t t-esc="ending_balance"/>-->
+<!--                                        <t t-set="ending_balance_total" t-value="ending_balance_total+ending_balance"/>-->
+<!--                                    </td>-->
+<!--                                    <td>-->
+<!--                                        <t t-set="changing_balance" t-value="ending_balance-starting_balance"/>-->
+<!--                                        <t t-esc="changing_balance"/>-->
+<!--                                        <t t-set="changing_balance_total"-->
+<!--                                           t-value="changing_balance_total+changing_balance"/>-->
+<!--                                    </td>-->
+<!--                            </tr>-->
+<!--                        </tbody>-->
+<!--                <tfoot>-->
+
+<!--                    <tr >-->
+<!--                        <td>Total</td>-->
+<!--                        <td class="col-1 text-end">-->
+<!--                            <t t-esc="starting_balance_total"/>-->
+<!--                        </td>-->
+<!--                        <td class="col-1 text-end">-->
+<!--                            <t t-esc="ending_balance_total"/>-->
+<!--                        </td>-->
+<!--                        <td class="col-1 text-end">-->
+<!--                            <t t-esc="changing_balance_total"/>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                </tfoot>-->
+<!--            </table>-->
+<!--        </template>-->
         <template id="daily_admin_report_journal">
             <table class="bordered-table">Balance
                         <thead>
@@ -413,7 +481,7 @@
                             </tr>
                         </thead>
 
-                        <!--                        Todo journal Balance=direct_payment+running_balance-->
+                        <!-- Todo journal Balance=direct_payment+running_balance-->
                         <t t-set="starting_direct_payment" t-value="docs._get_direct_bank_payments(docs.date_start)"/>
                         <t t-set="starting_running_balance"   t-value="docs._get_journal_dashboard_bank_running_balance(docs.date_start)"/>
 
@@ -432,7 +500,7 @@
                                     </td>
                                     <td>
                                         <t t-set="starting_balance"
-                                           t-value="starting_direct_payment[journal.id][1]+ starting_running_balance[journal.id][1]"/>
+                                           t-value="journal.current_statement_balance+ starting_running_balance[journal.id][1]"/>
                                         <t t-esc="starting_balance"/>
                                         <t t-set="starting_balance_total"
                                            t-value="starting_balance_total+starting_balance"/>
