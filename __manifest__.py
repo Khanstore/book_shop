@@ -41,7 +41,7 @@ governements, etc.)
         'reports/sale_order.xml',
         'data/book_shop_pages.xml',
         # 'wizard/wizard_views.xml',
-        'wizard/product_from_website.xml',
+        # 'wizard/product_from_website.xml',
         # 'reports/daily_admin_report.xml',
         'reports/stock_piking.xml',
         'views/khan_store_page.xml',
