@@ -14,5 +14,37 @@ WHERE credit = 0
         AND journal_id = 12
   );
 
-  UPDATE account_move_line aml
-SET account_id = 140 where debit=0 and move_id in (select move_Id from account_payment where payment_type='outbound' and journal_id=12);
+  -- select journal Line where account id is different from default
+-- SELECT
+--     aml.id,
+--     aml.move_id,am.journal_id AS move_journal,
+--     aml.journal_id AS line_journal,
+--     aml.account_id
+
+
+-- FROM account_move_line AS aml
+-- INNER JOIN account_move AS am ON am.id = aml.move_id
+-- WHERE aml.journal_id = 12
+--   AND aml.account_id NOT IN (7, 140)
+-- ORDER BY aml.id ASC;
+
+--update account_id
+-- UPDATE account_move_line AS aml
+-- SET account_id = aj.default_account_id
+-- FROM account_move AS am
+-- JOIN account_journal AS aj ON aj.id = am.journal_id
+-- WHERE aml.move_id = am.id
+--   AND aml.journal_id = 12
+--   AND aml.account_id NOT IN (7, 140);
+
+
+-- ??UPDATE account_move AS am
+-- SET journal_id = ap.journal_id
+-- FROM account_payment AS ap
+-- WHERE am.id = ap.move_id
+--   AND ap.journal_id = 12
+--   AND am.journal_id <> ap.journal_id;
+
+
+select ap.move_id,ap.journal_id as pay_jurnal,am.journal_id as move_journal ,am.name  from account_payment as ap  inner join account_move as am on am.id=ap.move_id
+where ap.journal_id =12 and am.journal_id <> ap.journal_id
