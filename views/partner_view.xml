@@ -73,28 +73,7 @@
 
         </record>
 
-    <record model="ir.ui.view" id="res_partner_view_form">
-            <field name="name">book.shop.res.partner.view.form.inherit</field>
-            <field name="model">res.partner</field>
-            <field name="inherit_id" ref="account_followup.res_partner_view_form"/>
-            <field name="arch" type="xml">
-                <button name="open_customer_statement" position="replace">
-                    <button groups="account.group_account_invoice" type="object" class="oe_stat_button" name="open_customer_statement" icon="fa-list">
-                        <div class="o_field_widget o_stat_info">
-                            <span class="o_stat_value">
-                                <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible=" total_balance &gt; 0" class="text-danger"/>
-                                <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="total_balance == 0 or total_balance &lt; 0"/>
-          <!--fixme following entry mis guides
-                                <field name="total_due" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="total_due == 0 or total_overdue == 0" class="text-danger"/>
-                                <field name="total_due" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="total_due == 0 or total_overdue != 0"/>
--->
-                            </span>
-                            <span class="o_stat_text">Customer Statement</span>
-                        </div>
-                    </button>
-                </button>
-            </field>
-    </record>
+
 
 
     </data>
