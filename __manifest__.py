@@ -44,6 +44,7 @@ governements, etc.)
         'views/khan_store_page.xml',
         'views/menu.xml',
         'todo_applet/todo_applet_view.xml',
+        'wizard/wizard_views.xml',
     ],
     'installable': True,
     'license': 'LGPL-3',
