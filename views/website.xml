@@ -109,16 +109,18 @@
                 <h8>Author:</h8>
                 <t t-foreach="product.author_ids" t-as="author">
                     <!--fixme set the public_category_id for the author_id-->
-                    <t t-set="author_link" t-value="'/shop/category/'+str(author.get_author_ecom_category().id)"/>
-                    <a t-att-href="author_link" t-field="author.name"/>,
+                    <t t-set="author_category" t-value="author.sudo().get_author_ecom_category()"/>
+                    <t t-set="author_link" t-value="'/shop/category/'+str(author_category.id)"/>
+                    <a t-att-href="author_link" t-esc="author_category.name"/>,
                 </t>
                 <br/>
                 <h7>Publisher:</h7>
                 <t t-foreach="product.publisher_ids" t-as="publisher">
                     <!--fixme set the public_category_id for the publisher_id-->
+                    <t t-set="publisher_category" t-value="publisher.sudo().get_author_ecom_category()"/>
                     <t t-set="publisher_link"
-                       t-value="'/shop/category/'+str(publisher.get_publisher_ecom_category().id)"/>
-                    <a t-att-href="publisher_link" t-field="publisher.name"/>,
+                       t-value="'/shop/category/'+str(publisher.sudo().get_publisher_ecom_category().id)"/>
+                    <a t-att-href="publisher_link" t-esc="publisher_category.name"/>,
                 </t>
             </t>
         </xpath>
