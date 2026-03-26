@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<!--
     <data>
         <record id="daily_admin_report_view" model="ir.ui.view">
             <field name="name">book.shop.daily.statement.view</field>
@@ -59,7 +60,7 @@
                         <field name="journals">
                             <list>
                                 <field name="name"/>
-<!--                                <field name="calculated_value"/>-->
+&lt;!&ndash;                                <field name="calculated_value"/>&ndash;&gt;
                             </list>
                         </field>
                         <button name="update_fields" string="Update" type="object"/>
@@ -76,5 +77,6 @@
             <field name="target">current</field>
         </record>
     </data>
+-->
 
 </odoo>

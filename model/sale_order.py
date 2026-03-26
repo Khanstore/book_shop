@@ -57,11 +57,24 @@ class saleOrderLine(models.Model):
 
     def action_sale_history(self):
         self.ensure_one()
-        action = self.env["ir.actions.actions"]._for_xml_id("book_shop.action_sale_history")
-        action['domain'] = [('state', 'in', ['sale', 'done']), ('product_id', '=', self.product_id.id)]
-        action['display_name'] = _("Sales History for %s", self.product_id.display_name)
-        action['context'] = {
-            'search_default_partner_id': self.partner_id.id
-        }
 
-        return action
+        # Define the action dictionary from scratch
+        return {
+            'name': f"Sales History: {self.product_id.name}",
+            'type': 'ir.actions.act_window',
+            'res_model': 'sale.order.line',
+            'view_mode': 'list,pivot,graph',
+            # Hard domain to ensure we only see relevant, completed sales
+            'domain': [
+                # ('product_id', '=', self.product_id.id),
+                ('state', 'in', ['sale', 'done'])
+            ],
+            'context': {
+                # Order matters: Product will appear LEFT, Partner will appear RIGHT
+                'search_default_product_id': self.product_id.id,
+                'search_default_order_partner_id': self.order_id.partner_id.id,
+                # Optional: Group by date or customer by default
+                'search_default_groupby_customer': 1,
+            },
+            'target': 'new',  # Opens in a pop-up (use 'current' to switch screens)
+        }
