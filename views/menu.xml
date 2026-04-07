@@ -4,7 +4,7 @@
 
         <menuitem id="shop_menu_root"
                   name="Shop"
-                  web_icon="static/description/icon.png"
+                  web_icon="book_shop,static/icon.png"
                   active="True"
                   sequence="30">
 
