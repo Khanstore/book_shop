@@ -136,47 +136,31 @@ class ProductTemplate(models.Model):
                 [('related_publisher_id', '=', line._origin.id)])
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
+
+
     # @api.model
     # def name_search(self, name, args=None, operator='ilike', limit=100):
     #     args = args or []
-    #     domain = [('name', operator, name)]  # Default search in current language
+    #     search_domain = [('name', operator, name)]  # Default search in the current language
     #
-    #     # Fetch translations dynamically using Odoo’s `with_context` method
-    #     translated_product_ids = set()
+    #     # Get all active languages
     #     active_langs = self.env['res.lang'].search([('active', '=', True)])
+    #     product_ids = set()
     #
+    #     # Search product names in all active languages
     #     for lang in active_langs:
     #         translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
-    #         translated_product_ids.update(translated_products.ids)
+    #         product_ids.update(translated_products.ids)
     #
-    #     if translated_product_ids:
-    #         domain = ['|'] + domain + [('id', 'in', list(translated_product_ids))]
+    #     # Add translated product IDs to the search domain
+    #     if product_ids:
+    #         search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
     #
-    #     return self.search(domain + args, limit=limit).name_get()
-
-    @api.model
-    def name_search(self, name, args=None, operator='ilike', limit=100):
-        args = args or []
-        search_domain = [('name', operator, name)]  # Default search in the current language
-
-        # Get all active languages
-        active_langs = self.env['res.lang'].search([('active', '=', True)])
-        product_ids = set()
-
-        # Search product names in all active languages
-        for lang in active_langs:
-            translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
-            product_ids.update(translated_products.ids)
-
-        # Add translated product IDs to the search domain
-        if product_ids:
-            search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
-
-        # Search for products
-        products = self.search(search_domain + args, limit=limit)
-
-        # Return product names manually
-        return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
+    #     # Search for products
+    #     products = self.search(search_domain + args, limit=limit)
+    #
+    #     # Return product names manually
+    #     return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
 
 
 class ProductProduct(models.Model):
@@ -239,69 +223,55 @@ class ProductProduct(models.Model):
                         template.with_context(sync_from_variant=True).write(update_vals)
         return res
 
-    # # set template fields with same value while only one variant
-    # def write(self, vals):
-    #     update_template = True
-    #     if "no_update" in vals:
-    #         del vals["no_update"]
-    #         update_template = False
-    #     res = super(ProductProduct, self).write(vals)
-    #     tmpl=self.product_tmpl_id
-    #     if tmpl.product_variant_count == 1 and update_template:
-    #         vals['no_update'] = True
-    #         if 'list_price' in vals:
-    #             tmpl.write({'list_price': vals['list_price'],'no_update':True})
-    #         if 'standard_price' in vals:
-    #             tmpl.write({'standard_price': vals['standard_price'],'no_update':True})
-    #     return res
-    @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        # multi langual search is working 
-        user_lang = self.env.context.get('lang', 'en_US')
-        domain = args or []
-        positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
-        is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
-        matched_ids = set()
 
-        # Search in all active languages
-        active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
-
-        for lang_code in active_langs:
-            env_lang = self.with_context(lang=lang_code)
-
-            # Try exact code/barcode matches first (fast lookup)
-            products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
-            products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
-
-            if not products and is_positive:
-                products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
-                                           limit=limit)
-                limit_rest = limit and limit - len(products)
-                if limit_rest is None or limit_rest > 0:
-                    products |= env_lang.search(
-                        expression.AND([
-                            domain,
-                            [('id', 'not in', list(matched_ids)), ('name', operator, name)]
-                        ]), limit=limit_rest
-                    )
-            elif not products and not is_positive:
-                products = env_lang.search(
-                    expression.AND([
-                        domain,
-                        [('name', operator, name), '|', ('default_code', operator, name),
-                         ('default_code', '=', False)]
-                    ]), limit=limit
-                )
-
-            matched_ids.update(products.ids)
-
-            # Stop early if limit is reached
-            if limit and len(matched_ids) >= limit:
-                break
-
-        # Final result in user's language
-        final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
-        return [(product.id, product.display_name) for product in final_products.sudo()]
+    # @api.model
+    # def name_search(self, name='', args=None, operator='ilike', limit=100):
+    #     # multi langual search is working
+    #     user_lang = self.env.context.get('lang', 'en_US')
+    #     domain = args or []
+    #     positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
+    #     is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
+    #     matched_ids = set()
+    #
+    #     # Search in all active languages
+    #     active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
+    #
+    #     for lang_code in active_langs:
+    #         env_lang = self.with_context(lang=lang_code)
+    #
+    #         # Try exact code/barcode matches first (fast lookup)
+    #         products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
+    #         products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
+    #
+    #         if not products and is_positive:
+    #             products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
+    #                                        limit=limit)
+    #             limit_rest = limit and limit - len(products)
+    #             if limit_rest is None or limit_rest > 0:
+    #                 products |= env_lang.search(
+    #                     expression.AND([
+    #                         domain,
+    #                         [('id', 'not in', list(matched_ids)), ('name', operator, name)]
+    #                     ]), limit=limit_rest
+    #                 )
+    #         elif not products and not is_positive:
+    #             products = env_lang.search(
+    #                 expression.AND([
+    #                     domain,
+    #                     [('name', operator, name), '|', ('default_code', operator, name),
+    #                      ('default_code', '=', False)]
+    #                 ]), limit=limit
+    #             )
+    #
+    #         matched_ids.update(products.ids)
+    #
+    #         # Stop early if limit is reached
+    #         if limit and len(matched_ids) >= limit:
+    #             break
+    #
+    #     # Final result in user's language
+    #     final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
+    #     return [(product.id, product.display_name) for product in final_products.sudo()]
 
 
 class ProductGenre(models.Model):
