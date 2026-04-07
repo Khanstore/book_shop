@@ -26,8 +26,7 @@ from . import purchase_order
 from . import ashraf
 from . import stock
 from . import account_move
-from . import delivery_carrier
 from . import webite_product
 from . import res_thana
 
-from . import website
+# from . import website
