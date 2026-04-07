@@ -54,7 +54,7 @@ governements, etc.)
             'book_shop/static/src/xml/pos_product_card.xml',
             ],
         'web.assets_backend': [
-                'book_shop/static/src/js/trim_tracking.js',
+                # 'book_shop/static/src/js/trim_tracking.js',
             ],
         'web.assets_frontend': [
             # 'book_shop/static/src/css/website.css',  # Include your css file here
