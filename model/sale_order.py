@@ -46,6 +46,7 @@ class SaleOrder(models.Model):
         print ("yes")
         # Open the invoice record (example: returning its form view in Odoo)
 
+
     
 class saleOrderLine(models.Model):
     _inherit ='sale.order.line'
@@ -54,6 +55,7 @@ class saleOrderLine(models.Model):
                                  store=True, index='btree_not_null')
     date_order = fields.Datetime(related='order_id.date_order', string='Order Date', readonly=True)
     date_approve = fields.Datetime(related="order_id.date_order", string='Confirmation Date', readonly=True)
+    sequence = fields.Integer(string="Sequence", default=1)
 
     def action_sale_history(self):
         self.ensure_one()
@@ -78,3 +80,4 @@ class saleOrderLine(models.Model):
             },
             'target': 'new',  # Opens in a pop-up (use 'current' to switch screens)
         }
+
