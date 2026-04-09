@@ -11,12 +11,10 @@
                     <!--fixme change colour for negative value-->
                     <field name="partner_balance"/>
                 </field>
-                <xpath expr="//field[@name='order_line']//field[@name='product_id']" position="attributes">
+                <xpath expr="//field[@name='order_line']//list//field[@name='product_id']" position="attributes">
                     <attribute name="options">{'no_create': True, 'no_open': True}</attribute>
                 </xpath>
-                <field name="technical_price_unit" position="after">
-                    <button name="action_sale_history" type="object" icon="fa-history" title="sale History" invisible="not id"/>
-                </field>
+
             </field>
         </record>
 
@@ -26,9 +24,10 @@
             <field name="model">sale.order</field>
             <field name="priority">2</field>
             <field name="arch" type="xml">
-                <field name="price_unit" position="after">
-                   <button name="action_sale_history" type="object" icon="fa-history" title="Sale History" invisible="not id"/>
-                </field>
+                <xpath expr="//field[@name='order_line']//list//field[@name='price_unit']" position="after">
+                    <button name="action_sale_history" type="object" icon="fa-history" title="Sale History" />
+                </xpath>
+
 
             </field>
         </record>
