@@ -31,7 +31,11 @@ from odoo.tools.translate import html_translate
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
     printed_name=fields.Char('Name')
-    is_book = fields.Boolean("Is A Book")
+    is_book = fields.Boolean(
+        "Is A Book",
+        compute='_compute_is_book',
+        store=True,  # store=True so it works in domains/filters too
+    )
     isbn = fields.Char(string="ISBN")
     author_ids = fields.Many2many(comodel_name="res.partner", relation='author_book_rel',column1='author_of',column2="author_ids", string="Author")
     publisher_ids = fields.Many2many(comodel_name="res.partner",relation='publisher_book_rel',column1='publisher_of',column2='publisher_ids',string="Publisher")
@@ -98,8 +102,10 @@ class ProductTemplate(models.Model):
         return res
 
 
-    @api.onchange('categ_id')
-    def define_book_product(self):
+    # @api.onchange('categ_id')
+
+    @api.depends('categ_id', 'categ_id.parent_id', 'categ_id.complete_name')
+    def _compute_is_book(self):
         for rec in self:
             category = rec.categ_id
             rec.is_book = False
