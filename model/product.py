@@ -136,7 +136,80 @@ class ProductTemplate(models.Model):
                 [('related_publisher_id', '=', line._origin.id)])
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
+    def _sync_public_categories_from_partners(self):
+        """Sync public_categ_ids based on author_ids and publisher_ids."""
+        PublicCategory = self.env['product.public.category']
 
+        for template in self:
+            # Collect current writer/publisher-linked categories
+            current_writer_categs = template.public_categ_ids.filtered(
+                lambda c: c.related_writer_id
+            )
+            current_publisher_categs = template.public_categ_ids.filtered(
+                lambda c: c.related_publisher_id
+            )
+
+            # Build expected categories from current author_ids
+            expected_writer_categs = PublicCategory.search([
+                ('related_writer_id', 'in', template.author_ids.ids)
+            ])
+
+            # Build expected categories from current publisher_ids
+            expected_publisher_categs = PublicCategory.search([
+                ('related_publisher_id', 'in', template.publisher_ids.ids)
+            ])
+
+            # Compute what to add and remove
+            to_add = (expected_writer_categs - current_writer_categs) | \
+                     (expected_publisher_categs - current_publisher_categs)
+            to_remove = (current_writer_categs - expected_writer_categs) | \
+                        (current_publisher_categs - expected_publisher_categs)
+
+            if to_add or to_remove:
+                commands = [(4, categ.id) for categ in to_add] + \
+                           [(3, categ.id) for categ in to_remove]
+                template.with_context(skip_categ_sync=True).write(
+                    {'public_categ_ids': commands}
+                )
+
+    # -----------------------------------------------
+    # Update your existing create() override
+    # -----------------------------------------------
+
+    def create(self, vals):
+        res = super().create(vals)
+
+        # Existing variant sync logic
+        product = self.env['product.product'].search([('product_tmpl_id', '=', res.id)])
+        sync_dict = {}
+        for key in vals:
+            if isinstance(key, str) and key in product._fields:
+                sync_dict[key] = vals[key]
+        product.write(sync_dict)
+
+        # NEW: sync ecommerce categories after record has an ID
+        res._sync_public_categories_from_partners()
+
+        return res
+
+    # -----------------------------------------------
+    # Update your existing write() override
+    # -----------------------------------------------
+
+    def write(self, vals):
+        res = super().write(vals)
+
+        # Existing variant sync logic (your current code stays here unchanged)
+        for template in self:
+            if len(template.product_variant_ids) == 1:
+                ...  # your existing sync logic
+
+        # NEW: sync ecommerce categories only when authors/publishers changed
+        if ('author_ids' in vals or 'publisher_ids' in vals) and \
+                not self.env.context.get('skip_categ_sync'):
+            self._sync_public_categories_from_partners()
+
+        return res
 
     # @api.model
     # def name_search(self, name, args=None, operator='ilike', limit=100):
