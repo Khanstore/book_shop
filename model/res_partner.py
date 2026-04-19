@@ -221,4 +221,56 @@ class Partner(models.Model):
         ecom_categ = self.env['product.public.category'].search([('related_publisher_id', '=', self._origin.id)])
         return ecom_categ
 
-    
+    def _sync_ecommerce_categories(self):
+        """Create or unlink ecommerce categories based on is_writer / is_publisher flags."""
+        PublicCategory = self.env['product.public.category']
+
+        for partner in self:
+            # --- Writer category ---
+            existing_writer_categ = PublicCategory.search(
+                [('related_writer_id', '=', partner.id)]
+            )
+            if partner.is_writer and not existing_writer_categ:
+                parent = self.env['ir.model.data']._xmlid_to_res_id(
+                    'book_shop.product_public_category_author', raise_if_not_found=False
+                )
+                PublicCategory.create({
+                    'name': partner.name,
+                    'parent_id': parent,
+                    'related_writer_id': partner.id,
+                })
+            elif not partner.is_writer and existing_writer_categ:
+                # Optional: unlink category if writer flag is removed
+                existing_writer_categ.unlink()
+
+            # --- Publisher category ---
+            existing_publisher_categ = PublicCategory.search(
+                [('related_publisher_id', '=', partner.id)]
+            )
+            if partner.is_publisher and not existing_publisher_categ:
+                parent = self.env['ir.model.data']._xmlid_to_res_id(
+                    'book_shop.product_public_category_publication', raise_if_not_found=False
+                )
+                PublicCategory.create({
+                    'name': partner.name,
+                    'parent_id': parent,
+                    'related_publisher_id': partner.id,
+                })
+            elif not partner.is_publisher and existing_publisher_categ:
+                # Optional: unlink category if publisher flag is removed
+                existing_publisher_categ.unlink()
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        # Create the partner(s) first so they get an ID
+        partners = super().create(vals_list)
+        # Now sync categories — partner.id is available
+        partners._sync_ecommerce_categories()
+        return partners
+
+    def write(self, vals):
+        res = super().write(vals)
+        # Only re-sync if the relevant flags were part of this write
+        if 'is_writer' in vals or 'is_publisher' in vals:
+            self._sync_ecommerce_categories()
+        return res
