@@ -45,6 +45,17 @@
                     </t>
                 </t>
             </t>
+            <!-- Add header -->
+        <xpath expr="//th[@name='th_description']" position="before">
+            <th class="text-center">#</th>
+        </xpath>
+
+        <!-- Add serial number -->
+        <xpath expr="//td[@name='td_name']" position="before">
+            <td class="text-center">
+                <span t-esc="line_index + 1"/>
+            </td>
+        </xpath>
 
         </template>
 
