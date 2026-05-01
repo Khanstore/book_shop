@@ -36,6 +36,8 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <menuitem id="menu_dev_root" name="Developer" sequence="100"/>
+    <menuitem id="menu_dev_root" name="Developer" sequence="100"
+        web_icon="book_shop,todo_applet/icon.png"
+    />
     <menuitem id="menu_dev_todo" name="To-Do Checklist" parent="menu_dev_root" sequence="10" action="action_dev_todo"/>
 </odoo>
