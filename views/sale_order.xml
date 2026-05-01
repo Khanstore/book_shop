@@ -18,6 +18,20 @@
             </field>
         </record>
 
+
+        <record id="sale_order_kit_prduct_view" model="ir.ui.view">
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="name">sale.order.kit.product</field>
+            <field name="model">sale.order</field>
+            <field name="priority">2</field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']" position="attributes">
+                    <attribute name="readonly">qty_invoiced &gt; 0</attribute>
+                </xpath>
+
+            </field>
+        </record>
+
         <record id="sale_order_history_view" model="ir.ui.view">
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="name">sale.order.history.form</field>

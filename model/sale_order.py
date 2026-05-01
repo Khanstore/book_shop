@@ -81,3 +81,6 @@ class saleOrderLine(models.Model):
             'target': 'new',  # Opens in a pop-up (use 'current' to switch screens)
         }
 
+    # the components instantly recompute!
+        for line in self:
+                    # Derive the price from the component's actual value.

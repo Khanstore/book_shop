@@ -414,8 +414,15 @@ class ProductPublicCategory(models.Model):
     _inherit='product.public.category'
     _description='this modules adds product public categories for writer and publishers'
     is_published = fields.Boolean("Is Published", default=False)
+    product_tmpl_count=fields.Integer(string="Product Count",compute="get_product_tmpl_count",store=True)
     related_writer_id=fields.Many2one('res.partner',"Writer")
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
+
+    def get_product_tmpl_count(self):
+        for rec in self:
+            rec.product_tmpl_count=self.env['product.template'].search_count([
+                ('public_categ_ids', 'in', rec.id)])
+
 
 
 

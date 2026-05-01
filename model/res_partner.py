@@ -39,6 +39,7 @@ class Partner(models.Model):
     publisher_of = fields.Many2many(comodel_name="product.template",relation= 'publisher_book_rel',column1= 'publisher_ids', column2='publisher_of',
                                     string="Publisher Of")
 
+
     # autopost_bills = fields.Selection(
     #     selection=[('always', 'Always'), ('ask', 'Ask after 3 validations without edits'), ('never', 'Never')],
     #     string='Auto-post bills',

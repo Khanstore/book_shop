@@ -16,8 +16,7 @@
                     <strong>
                         <t t-out="doc.partner_shipping_id.name"/>
                     </strong>
-                    <div t-field="doc.partner_shipping_id"
-                         t-options='{"widget": "contact", "fields": ["address","phone","mobile"], "no_marker": Yes}'/>
+                    <div t-field="doc.delivery_address"/>
                     <p t-if="doc.partner_id.vat">
                         <t t-if="doc.company_id.account_fiscal_country_id.vat_label"
                            t-out="doc.company_id.account_fiscal_country_id.vat_label"/>
