@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 {
     'name': "Book Shop",
     'description':"""
@@ -52,9 +53,12 @@ governements, etc.)
         'point_of_sale._assets_pos': [
             'book_shop/static/src/css/pos_image_fix.css',
             'book_shop/static/src/xml/pos_product_card.xml',
+            'book_shop/static/src/css/pos_receipt.css',
+            'book_shop/static/src/xml/pos_receipt.xml',
+            'book_shop/static/src/xml/receipt_header.xml',
             ],
         'web.assets_backend': [
-                'book_shop/static/src/js/trim_tracking.js',
+                # 'book_shop/static/src/js/trim_tracking.js',
             ],
         'web.assets_frontend': [
             # 'book_shop/static/src/css/website.css',  # Include your css file here
@@ -63,4 +67,3 @@ governements, etc.)
         ],
         },
     }
-

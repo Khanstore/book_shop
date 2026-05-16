@@ -31,7 +31,11 @@ from odoo.tools.translate import html_translate
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
     printed_name=fields.Char('Name')
-    is_book = fields.Boolean("Is A Book")
+    is_book = fields.Boolean(
+        "Is A Book",
+        compute='_compute_is_book',
+        store=True,  # store=True so it works in domains/filters too
+    )
     isbn = fields.Char(string="ISBN")
     author_ids = fields.Many2many(comodel_name="res.partner", relation='author_book_rel',column1='author_of',column2="author_ids", string="Author")
     publisher_ids = fields.Many2many(comodel_name="res.partner",relation='publisher_book_rel',column1='publisher_of',column2='publisher_ids',string="Publisher")
@@ -98,8 +102,10 @@ class ProductTemplate(models.Model):
         return res
 
 
-    @api.onchange('categ_id')
-    def define_book_product(self):
+    # @api.onchange('categ_id')
+
+    @api.depends('categ_id', 'categ_id.parent_id', 'categ_id.complete_name')
+    def _compute_is_book(self):
         for rec in self:
             category = rec.categ_id
             rec.is_book = False
@@ -136,47 +142,104 @@ class ProductTemplate(models.Model):
                 [('related_publisher_id', '=', line._origin.id)])
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
+    def _sync_public_categories_from_partners(self):
+        """Sync public_categ_ids based on author_ids and publisher_ids."""
+        PublicCategory = self.env['product.public.category']
+
+        for template in self:
+            # Collect current writer/publisher-linked categories
+            current_writer_categs = template.public_categ_ids.filtered(
+                lambda c: c.related_writer_id
+            )
+            current_publisher_categs = template.public_categ_ids.filtered(
+                lambda c: c.related_publisher_id
+            )
+
+            # Build expected categories from current author_ids
+            expected_writer_categs = PublicCategory.search([
+                ('related_writer_id', 'in', template.author_ids.ids)
+            ])
+
+            # Build expected categories from current publisher_ids
+            expected_publisher_categs = PublicCategory.search([
+                ('related_publisher_id', 'in', template.publisher_ids.ids)
+            ])
+
+            # Compute what to add and remove
+            to_add = (expected_writer_categs - current_writer_categs) | \
+                     (expected_publisher_categs - current_publisher_categs)
+            to_remove = (current_writer_categs - expected_writer_categs) | \
+                        (current_publisher_categs - expected_publisher_categs)
+
+            if to_add or to_remove:
+                commands = [(4, categ.id) for categ in to_add] + \
+                           [(3, categ.id) for categ in to_remove]
+                template.with_context(skip_categ_sync=True).write(
+                    {'public_categ_ids': commands}
+                )
+
+    # -----------------------------------------------
+    # Update your existing create() override
+    # -----------------------------------------------
+
+    def create(self, vals):
+        res = super().create(vals)
+
+        # Existing variant sync logic
+        product = self.env['product.product'].search([('product_tmpl_id', '=', res.id)])
+        sync_dict = {}
+        for key in vals:
+            if isinstance(key, str) and key in product._fields:
+                sync_dict[key] = vals[key]
+        product.write(sync_dict)
+
+        # NEW: sync ecommerce categories after record has an ID
+        res._sync_public_categories_from_partners()
+
+        return res
+
+    # -----------------------------------------------
+    # Update your existing write() override
+    # -----------------------------------------------
+
+    def write(self, vals):
+        res = super().write(vals)
+
+        # Existing variant sync logic (your current code stays here unchanged)
+        for template in self:
+            if len(template.product_variant_ids) == 1:
+                ...  # your existing sync logic
+
+        # NEW: sync ecommerce categories only when authors/publishers changed
+        if ('author_ids' in vals or 'publisher_ids' in vals) and \
+                not self.env.context.get('skip_categ_sync'):
+            self._sync_public_categories_from_partners()
+
+        return res
+
     # @api.model
     # def name_search(self, name, args=None, operator='ilike', limit=100):
     #     args = args or []
-    #     domain = [('name', operator, name)]  # Default search in current language
+    #     search_domain = [('name', operator, name)]  # Default search in the current language
     #
-    #     # Fetch translations dynamically using Odoo’s `with_context` method
-    #     translated_product_ids = set()
+    #     # Get all active languages
     #     active_langs = self.env['res.lang'].search([('active', '=', True)])
+    #     product_ids = set()
     #
+    #     # Search product names in all active languages
     #     for lang in active_langs:
     #         translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
-    #         translated_product_ids.update(translated_products.ids)
+    #         product_ids.update(translated_products.ids)
     #
-    #     if translated_product_ids:
-    #         domain = ['|'] + domain + [('id', 'in', list(translated_product_ids))]
+    #     # Add translated product IDs to the search domain
+    #     if product_ids:
+    #         search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
     #
-    #     return self.search(domain + args, limit=limit).name_get()
-
-    @api.model
-    def name_search(self, name, args=None, operator='ilike', limit=100):
-        args = args or []
-        search_domain = [('name', operator, name)]  # Default search in the current language
-
-        # Get all active languages
-        active_langs = self.env['res.lang'].search([('active', '=', True)])
-        product_ids = set()
-
-        # Search product names in all active languages
-        for lang in active_langs:
-            translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
-            product_ids.update(translated_products.ids)
-
-        # Add translated product IDs to the search domain
-        if product_ids:
-            search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
-
-        # Search for products
-        products = self.search(search_domain + args, limit=limit)
-
-        # Return product names manually
-        return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
+    #     # Search for products
+    #     products = self.search(search_domain + args, limit=limit)
+    #
+    #     # Return product names manually
+    #     return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
 
 
 class ProductProduct(models.Model):
@@ -239,69 +302,55 @@ class ProductProduct(models.Model):
                         template.with_context(sync_from_variant=True).write(update_vals)
         return res
 
-    # # set template fields with same value while only one variant
-    # def write(self, vals):
-    #     update_template = True
-    #     if "no_update" in vals:
-    #         del vals["no_update"]
-    #         update_template = False
-    #     res = super(ProductProduct, self).write(vals)
-    #     tmpl=self.product_tmpl_id
-    #     if tmpl.product_variant_count == 1 and update_template:
-    #         vals['no_update'] = True
-    #         if 'list_price' in vals:
-    #             tmpl.write({'list_price': vals['list_price'],'no_update':True})
-    #         if 'standard_price' in vals:
-    #             tmpl.write({'standard_price': vals['standard_price'],'no_update':True})
-    #     return res
-    @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100):
-        # multi langual search is working 
-        user_lang = self.env.context.get('lang', 'en_US')
-        domain = args or []
-        positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
-        is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
-        matched_ids = set()
 
-        # Search in all active languages
-        active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
-
-        for lang_code in active_langs:
-            env_lang = self.with_context(lang=lang_code)
-
-            # Try exact code/barcode matches first (fast lookup)
-            products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
-            products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
-
-            if not products and is_positive:
-                products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
-                                           limit=limit)
-                limit_rest = limit and limit - len(products)
-                if limit_rest is None or limit_rest > 0:
-                    products |= env_lang.search(
-                        expression.AND([
-                            domain,
-                            [('id', 'not in', list(matched_ids)), ('name', operator, name)]
-                        ]), limit=limit_rest
-                    )
-            elif not products and not is_positive:
-                products = env_lang.search(
-                    expression.AND([
-                        domain,
-                        [('name', operator, name), '|', ('default_code', operator, name),
-                         ('default_code', '=', False)]
-                    ]), limit=limit
-                )
-
-            matched_ids.update(products.ids)
-
-            # Stop early if limit is reached
-            if limit and len(matched_ids) >= limit:
-                break
-
-        # Final result in user's language
-        final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
-        return [(product.id, product.display_name) for product in final_products.sudo()]
+    # @api.model
+    # def name_search(self, name='', args=None, operator='ilike', limit=100):
+    #     # multi langual search is working
+    #     user_lang = self.env.context.get('lang', 'en_US')
+    #     domain = args or []
+    #     positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
+    #     is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
+    #     matched_ids = set()
+    #
+    #     # Search in all active languages
+    #     active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
+    #
+    #     for lang_code in active_langs:
+    #         env_lang = self.with_context(lang=lang_code)
+    #
+    #         # Try exact code/barcode matches first (fast lookup)
+    #         products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
+    #         products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
+    #
+    #         if not products and is_positive:
+    #             products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
+    #                                        limit=limit)
+    #             limit_rest = limit and limit - len(products)
+    #             if limit_rest is None or limit_rest > 0:
+    #                 products |= env_lang.search(
+    #                     expression.AND([
+    #                         domain,
+    #                         [('id', 'not in', list(matched_ids)), ('name', operator, name)]
+    #                     ]), limit=limit_rest
+    #                 )
+    #         elif not products and not is_positive:
+    #             products = env_lang.search(
+    #                 expression.AND([
+    #                     domain,
+    #                     [('name', operator, name), '|', ('default_code', operator, name),
+    #                      ('default_code', '=', False)]
+    #                 ]), limit=limit
+    #             )
+    #
+    #         matched_ids.update(products.ids)
+    #
+    #         # Stop early if limit is reached
+    #         if limit and len(matched_ids) >= limit:
+    #             break
+    #
+    #     # Final result in user's language
+    #     final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
+    #     return [(product.id, product.display_name) for product in final_products.sudo()]
 
 
 class ProductGenre(models.Model):
@@ -365,8 +414,15 @@ class ProductPublicCategory(models.Model):
     _inherit='product.public.category'
     _description='this modules adds product public categories for writer and publishers'
     is_published = fields.Boolean("Is Published", default=False)
+    product_tmpl_count=fields.Integer(string="Product Count",compute="get_product_tmpl_count",store=True)
     related_writer_id=fields.Many2one('res.partner',"Writer")
     related_publisher_id=fields.Many2one('res.partner',"Publisher")
+
+    def get_product_tmpl_count(self):
+        for rec in self:
+            rec.product_tmpl_count=self.env['product.template'].search_count([
+                ('public_categ_ids', 'in', rec.id)])
+
 
 
 

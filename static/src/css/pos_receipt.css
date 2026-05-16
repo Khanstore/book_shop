@@ -1,0 +1,136 @@
+// ── 80mm thermal paper = ~560px usable width ──
+// All sizing is in pt so it maps cleanly to thermal print DPI
+
+.pos-receipt-compact {
+  font-family: 'Courier New', Courier, monospace; // monospace = column alignment
+  font-size: 8pt;
+  line-height: 1.15;
+  color: #000;
+  background: #fff;
+  padding: 2mm 3mm;
+  width: 72mm;   // safe printable area inside 80mm roll
+  margin: 0 auto;
+
+  // ── Utility ──────────────────────────────────
+  .rc-bold   { font-weight: 700; }
+  .rc-center { text-align: center; }
+
+  .rc-div {
+    border-top: 1px dashed #000;
+    margin: 2mm 0;
+
+    &.rc-div-thin {
+      border-top-style: dotted;
+      margin: 1mm 0;
+    }
+  }
+
+  // ── Header ───────────────────────────────────
+  .rc-header {
+    display: flex;
+    align-items: center;
+    gap: 2mm;
+    margin-bottom: 1.5mm;
+
+    .rc-logo {
+      max-width: 14mm;
+      max-height: 14mm;
+      object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .rc-shop {
+      display: flex;
+      flex-direction: column;
+      font-size: 7pt;
+      line-height: 1.2;
+
+      .rc-bold {
+        font-size: 9pt;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+    }
+  }
+
+  // ── Order meta (order# + date) ────────────────
+  .rc-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+    color: #333;
+    margin-bottom: 1mm;
+  }
+
+  // ── Order lines ───────────────────────────────
+  .rc-lines {
+    width: 100%;
+    border-collapse: collapse;
+
+    .rc-line td {
+      padding: 0.4mm 0;
+      vertical-align: top;
+    }
+
+    .rc-name  { width: 60%; word-break: break-word; }
+    .rc-qty   { width: 12%; text-align: center; font-size: 7pt; color: #444; }
+    .rc-price { width: 28%; text-align: right; white-space: nowrap; }
+
+    .rc-disc td {
+      font-size: 6.5pt;
+      color: #555;
+      padding: 0 0 0.5mm 2mm;
+    }
+  }
+
+  // ── Totals ────────────────────────────────────
+  .rc-totals {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5pt;
+
+    td { padding: 0.5mm 0; }
+    td:last-child { text-align: right; }
+
+    .rc-total-row {
+      font-size: 9.5pt;
+      border-top: 1px solid #000;
+      padding-top: 1mm;
+
+      td { padding-top: 1mm; }
+    }
+  }
+
+  // ── Payments ─────────────────────────────────
+  .rc-payments {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7pt;
+    color: #333;
+
+    td { padding: 0.3mm 0; }
+    td:last-child { text-align: right; }
+  }
+
+  // ── Barcode + footer ─────────────────────────
+  .rc-center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1mm;
+    margin-top: 1.5mm;
+
+    .rc-barcode {
+      max-width: 55mm;
+      height: 10mm;
+    }
+
+    .rc-thanks {
+      font-size: 7pt;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #555;
+    }
+  }
+}

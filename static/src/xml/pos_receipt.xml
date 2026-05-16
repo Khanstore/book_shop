@@ -1,0 +1,170 @@
+<templates id="template" xml:space="preserve">
+
+<t t-name="custom_pos.OrderReceiptCompact"
+   t-inherit="point_of_sale.OrderReceipt"
+   t-inherit-mode="extension">
+
+    <xpath expr="//div[contains(@class, 'pos-receipt')]" position="replace">
+
+        <div class="pos-receipt" style="padding:4px 6px;font-size:10px;line-height:1.1;">
+
+            <t t-set="showTaxGroupLabels" t-value="doesAnyOrderlineHaveTaxLabel()"/>
+
+            <!-- Header -->
+            <ReceiptHeader data="props.data.headerData" />
+
+            <!-- Order Lines -->
+            <OrderWidget
+                t-if="props.data.orderlines?.length"
+                lines="props.data.orderlines"
+                t-slot-scope="scope"
+                generalNote="props.data.generalNote or ''"
+                screenName="props.data.screenName">
+                <t t-set="line" t-value="scope.line"/>
+                <Orderline
+                    basic_receipt="props.basic_receipt"
+                    line="omit(scope.line, 'customerNote')"
+                    class="{ 'px-0': true }"
+                    showTaxGroupLabels="showTaxGroupLabels">
+                    <li t-if="line.customerNote"
+                        class="customer-note w-100 my-0 text-break"
+                        style="list-style:none;padding:2px 4px;font-size:10px;">
+                        <i class="fa fa-sticky-note me-1"/>
+                        <t t-esc="line.customerNote"/>
+                    </li>
+                </Orderline>
+            </OrderWidget>
+
+            <t t-if="!props.basic_receipt">
+                <t t-set="taxTotals" t-value="props.data.taxTotals"/>
+
+                <!-- Tax Groups -->
+                <div t-if="taxTotals and taxTotals.has_tax_groups" class="pos-receipt-taxes" style="margin-top:2px;">
+                    <div class="text-center" style="letter-spacing:1px;font-size:10px;">- - - - - - - - - - - - - -</div>
+                    <t t-foreach="taxTotals.subtotals" t-as="subtotal" t-key="subtotal.name">
+                        <div class="d-flex" style="margin:1px 0;">
+                            <span t-if="showTaxGroupLabels" class="me-1" style="visibility:hidden;">A</span>
+                            <span class="fw-bold text-nowrap mw-100" t-out="subtotal.name"/>
+                            <span t-esc="props.formatCurrency(subtotal.base_amount_currency)" class="ms-auto"/>
+                        </div>
+                        <div t-foreach="subtotal.tax_groups" t-as="tax_group" t-key="tax_group.id"
+                             class="d-flex" style="margin:1px 0;">
+                            <t t-if="showTaxGroupLabels">
+                                <span t-if="tax_group.group_label" t-out="tax_group.group_label" class="me-1"/>
+                                <span t-else="" class="me-1" style="visibility:hidden;">A</span>
+                            </t>
+                            <span>
+                                <span t-esc="tax_group.group_name"/>
+                                <t t-if="!taxTotals.same_tax_base">
+                                    on <span t-esc="props.formatCurrency(tax_group.base_amount_currency)"/>
+                                </t>
+                            </span>
+                            <span t-esc="props.formatCurrency(tax_group.tax_amount_currency)" class="ms-auto"/>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- Total -->
+                <div class="text-center" style="letter-spacing:1px;font-size:10px;">- - - - - - - - - - - - - -</div>
+                <div class="pos-receipt-amount receipt-total d-flex" style="font-weight:bold;margin:2px 0;">
+                    <t t-out="props.data.label_total"/>
+                    <span t-esc="props.formatCurrency(taxTotals.order_sign * taxTotals.order_total)" class="ms-auto"/>
+                </div>
+
+                <!-- Rounding -->
+                <t t-if="props.data.show_rounding">
+                    <div class="pos-receipt-amount receipt-rounding d-flex" style="margin:1px 0;">
+                        <t t-out="props.data.label_rounding"/>
+                        <span t-esc="props.formatCurrency(taxTotals.order_sign * taxTotals.order_rounding)" class="ms-auto"/>
+                    </div>
+                    <div class="pos-receipt-amount receipt-to-pay d-flex" style="margin:1px 0;">
+                        <span>To Pay</span>
+                        <span t-esc="props.formatCurrency(taxTotals.order_sign * (taxTotals.order_total + taxTotals.order_rounding))" class="ms-auto"/>
+                    </div>
+                </t>
+
+                <!-- Payment Lines -->
+                <div class="paymentlines" style="margin-top:2px;">
+                    <div t-foreach="props.data.paymentlines" t-as="line" t-key="line_index"
+                         class="d-flex" style="margin:1px 0;">
+                        <t t-esc="line.name"/>
+                        <span t-esc="props.formatCurrency(line.amount)" class="ms-auto"/>
+                    </div>
+                </div>
+
+                <!-- Change -->
+                <div t-if="props.data.show_change"
+                     class="pos-receipt-amount receipt-change d-flex" style="margin:1px 0;">
+                    <t t-out="props.data.label_change"/>
+                    <span t-esc="props.formatCurrency(props.data.order_change)" class="ms-auto"/>
+                </div>
+
+                <!-- Discount -->
+                <t t-if="props.data.total_discount">
+                    <div class="d-flex" style="margin:1px 0;font-size:10px;">
+                        <t t-out="props.data.label_discounts"/>
+                        <span t-esc="props.formatCurrency(props.data.total_discount)" class="ms-auto"/>
+                    </div>
+                </t>
+
+                <div class="before-footer"/>
+                <div class="pos-receipt-order-data"/>
+
+                <!-- QR Code -->
+                <t t-if="props.data.pos_qr_code">
+                    <div class="pos-receipt-order-data" style="margin-top:4px;font-size:10px;">
+                        Need an invoice for your purchase?
+                    </div>
+                </t>
+                <div t-if="['qr_code', 'qr_code_and_url'].includes(props.data.headerData.company.point_of_sale_ticket_portal_url_display_mode) and props.data.pos_qr_code"
+                     style="margin:3px 0;">
+                    <img id="posqrcode" t-att-src="props.data.pos_qr_code" class="pos-receipt-logo"/>
+                </div>
+                <div t-if="props.data.pos_qr_code" class="unique-code pos-receipt-order-data" style="font-size:10px;">
+                    Code: <t t-esc="props.data.ticket_code"/>
+                </div>
+                <div t-if="['url', 'qr_code_and_url'].includes(props.data.headerData.company.point_of_sale_ticket_portal_url_display_mode) and props.data.pos_qr_code"
+                     class="portal-url pos-receipt-order-data" style="font-size:10px;margin-top:2px;">
+                    <t t-esc="getPortalURL()"/>
+                </div>
+            </t>
+
+            <!-- Footer -->
+            <div t-if="props.data.footer"
+                 class="pos-receipt-center-align"
+                 style="white-space:pre-line;margin-top:4px;font-size:10px;">
+                <t t-esc="props.data.footer"/>
+            </div>
+
+            <!-- Payment Terminal Receipts -->
+            <div class="after-footer">
+                <t t-foreach="props.data.paymentlines" t-as="line" t-key="line_index">
+                    <t t-if="line.ticket">
+                        <div class="pos-payment-terminal-receipt" style="margin-top:4px;">
+                            <pre t-esc="line.ticket" style="font-size:10px;margin:0;"/>
+                        </div>
+                    </t>
+                </t>
+            </div>
+
+            <!-- Shipping -->
+            <t t-if="props.data.shippingDate">
+                <div class="pos-receipt-order-data" style="margin-top:3px;font-size:10px;">
+                    Delivery: <t t-esc="props.data.shippingDate"/>
+                </div>
+            </t>
+
+            <!-- Order Meta -->
+            <div class="pos-receipt-order-data" style="margin-top:4px;font-size:10px;border-top:1px dashed #ccc;padding-top:3px;">
+                <t t-esc="props.data.name"/> Date :
+                <t id="order-date" t-esc="props.data.date"/>
+                <br/>
+            </div>
+
+        </div>
+
+    </xpath>
+
+</t>
+
+</templates>

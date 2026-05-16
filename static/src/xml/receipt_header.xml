@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="custom_pos.ReceiptHeader"
+       t-inherit="point_of_sale.ReceiptHeader"
+       t-inherit-mode="extension">
+
+        <!-- Step 1: Replace the outer flex-column wrapper with a side-by-side row -->
+        <xpath expr="//div[contains(@class,'d-flex') and contains(@class,'flex-column')]" position="replace">
+            <div class="d-flex flex-row align-items-center" style="gap:2px;margin-bottom:1px;">
+
+                <!-- Logo on the left -->
+                <img t-attf-src="/web/image?model=res.company&amp;id={{props.data.company.id}}&amp;field=logo"
+                     alt="Logo"
+                     style="width:64px;height:64px;object-fit:contain;flex-shrink:0;"/>
+
+                <!-- Company details on the right -->
+                <div class="pos-receipt-contact" style="font-size:11px;line-height:1.35;flex:1;">
+                    <div t-if="props.data.company.name"
+                         style="font-weight:bold;font-size:15px;"
+                         t-esc="props.data.company.name"/>
+                    <div t-if="props.data.company.phone">
+                        Tel: <t t-esc="props.data.company.phone"/>
+                    </div>
+<!--                    <div t-if="props.data.company.vat" t-esc="vatText"/>-->
+<!--                    <div t-if="props.data.company.email" t-esc="props.data.company.email"/>-->
+<!--                    <div t-if="props.data.company.website" t-esc="props.data.company.website"/>-->
+                    <div t-if="props.data.header"
+                         style="white-space:pre-line;margin-top:1px;"
+                         t-esc="props.data.header"/>
+                    <div t-if="props.data.cashier" style="margin-top:1px;">
+                        <div style="border-top:1px dashed #aaa;margin-bottom:1px;"/>
+                        <t t-esc="props.data.cashier"/>
+                    </div>
+                    <!--<div t-if="props.data.trackingNumber and !props.data.bigTrackingNumber">
+                        <span class="tracking-number fs-1" t-esc="props.data.trackingNumber"/>
+                    </div>-->
+                </div>
+
+            </div>
+        </xpath>
+
+        <!-- Step 2: Remove the standalone logo img that sits above the wrapper -->
+        <xpath expr="//img[contains(@class,'pos-receipt-logo')]" position="replace"/>
+
+        <!-- Step 3: Remove both loose <br/> tags -->
+        <xpath expr="//br[1]" position="replace"/>
+        <xpath expr="//br[1]" position="replace"/>
+
+        <!-- Step 4: Remove the original cashier block (now inlined above) -->
+<!--        <xpath expr="//div[@class='cashier']" position="replace"/>-->
+
+        <!-- Step 5: Remove the original small tracking number div (now inlined above) -->
+<!--        <xpath expr="//div[span[contains(@class,'tracking-number')]]" position="replace"/>-->
+
+    </t>
+</templates>
