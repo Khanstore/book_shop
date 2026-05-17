@@ -62,30 +62,30 @@ class SaleOrder(models.Model):
         print ("yes")
         # Open the invoice record (example: returning its form view in Odoo)
 
-    @api.onchange('order_line', 'order_line.price_unit')
-    def _onchange_combo_line_pricing(self):
-        """
-        Triggered in real-time whenever an order line
-        or a unit price within those lines is modified.
-        """
-        for line in self.order_line:
-            # Check if this line is a component linked to a parent
-            if line.linked_line_id:
-                parent_line = line.linked_line_id
-
-                if parent_line.price_unit > 0.0:
-                    # Parent has a price? Component becomes 0.
-                    if line.price_unit != 0.0:
-                        line.price_unit = 0.0
-                else:
-                    # Parent price is 0? Component pulls its real list price.
-                    # We only set it if it's currently 0 to avoid overwriting
-                    # manual edits you might have made.
-                    if line.price_unit == 0.0:
-                        line.price_unit = line.product_id.list_price
-            else :
-                line.price_unit = self.pricelist_id._get_product_price(line.product_id,
-                                                                     line.product_uom_qty)
+    # @api.onchange('order_line', 'order_line.price_unit')
+    # def _onchange_combo_line_pricing(self):
+    #     """
+    #     Triggered in real-time whenever an order line
+    #     or a unit price within those lines is modified.
+    #     """
+    #     for line in self.order_line:
+    #         # Check if this line is a component linked to a parent
+    #         if line.linked_line_id:
+    #             parent_line = line.linked_line_id
+    #
+    #             if parent_line.price_unit > 0.0:
+    #                 # Parent has a price? Component becomes 0.
+    #                 if line.price_unit != 0.0:
+    #                     line.price_unit = 0.0
+    #             else:
+    #                 # Parent price is 0? Component pulls its real list price.
+    #                 # We only set it if it's currently 0 to avoid overwriting
+    #                 # manual edits you might have made.
+    #                 if line.price_unit == 0.0:
+    #                     line.price_unit = line.product_id.list_price
+    #         # else :
+    #         #     line.price_unit = self.pricelist_id._get_product_price(line.product_id,
+    #         #                                                          line.product_uom_qty)
 
 
     
