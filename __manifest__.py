@@ -53,8 +53,8 @@ governements, etc.)
         'point_of_sale._assets_pos': [
             'book_shop/static/src/css/pos_image_fix.css',
             'book_shop/static/src/xml/pos_product_card.xml',
-            'book_shop/static/src/css/pos_receipt.css',
-            'book_shop/static/src/xml/pos_receipt.xml',
+            # 'book_shop/static/src/css/pos_receipt.css',
+            # 'book_shop/static/src/xml/pos_receipt.xml',
             'book_shop/static/src/xml/receipt_header.xml',
             ],
         'web.assets_backend': [
