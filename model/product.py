@@ -28,6 +28,25 @@ from odoo import fields, models, api, _
 from odoo.osv import expression
 from odoo.tools.translate import html_translate
 
+
+# In your Python file
+class ProductPen(models.Model):
+    _name = 'product.pen'
+    _inherits = {'product.template': 'product_tmpl_id'}
+
+    product_tmpl_id = fields.Many2one('product.template', required=True, ondelete='cascade')
+    ink_color = fields.Char('Ink Color')
+    product_color = fields.Char('Product Color')
+    tip_size=fields.Char('Tip Size')
+    design=fields.Char('Design')
+    tip_type=fields.Char('Tip Type')
+    use_type=fields.Char('Use Type')
+    material_type=fields.Char('Material Type')
+    writing_experience=fields.Char('Writing Experience')
+    feature=fields.Char('Feature')
+
+
+
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
     printed_name=fields.Char('Name')
@@ -52,55 +71,6 @@ class ProductTemplate(models.Model):
     length=fields.Float("lenght")
     height=fields.Float("Height")
     width=fields.Float("Width")
-
-    def create(self,vals):
-        res=super().create(vals)
-        product=self.env['product.product'].search([('product_tmpl_id','=',res.id)])
-        dict={}
-        for key in vals:
-            if isinstance(key, str) and key in product._fields:
-                dict[key]=vals[key]
-        product.write(dict)
-        return res
-
-
-    def write(self, vals):
-        res = super().write(vals)
-        for template in self:
-            if len(template.product_variant_ids) == 1:
-                if 'list_price' in vals:
-                    template.product_variant_id.list_price = vals['list_price']
-                variant = template.product_variant_ids[0]
-                if not self.env.context.get('sync_from_variant'):
-                    update_vals = {}
-                    if 'list_price' in vals and template.list_price != variant.list_price:
-                        update_vals['list_price'] = template.list_price
-                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
-                        update_vals['binding_type'] = template.binding_type.id
-                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
-                        update_vals['publication_date'] = template.publication_date
-                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
-                        update_vals['last_edition'] = template.last_edition
-                    if 'pages' in vals and template.pages != variant.pages:
-                        update_vals['pages'] = template.pages
-                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
-                        update_vals['paper_gsm'] = template.paper_gsm
-                    if 'height' in vals and template.height != variant.height:
-                        update_vals['height'] = template.height
-                    if 'width' in vals and template.width != variant.width:
-                        update_vals['width'] = template.width
-                    if 'weight' in vals and template.weight != variant.weight:
-                        update_vals['weight'] = template.weight
-                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
-                        update_vals['description_ecommerce'] = template.description_ecommerce
-                    if 'length' in vals and template.length != variant.length:
-                        update_vals['length'] = template.length
-
-
-                    if update_vals:
-                        variant.with_context(sync_from_template=True).write(update_vals)
-        return res
-
 
     # @api.onchange('categ_id')
 
@@ -205,12 +175,39 @@ class ProductTemplate(models.Model):
     def write(self, vals):
         res = super().write(vals)
 
-        # Existing variant sync logic (your current code stays here unchanged)
+        # Template -> variant sync logic (only when there's a single variant)
         for template in self:
             if len(template.product_variant_ids) == 1:
-                ...  # your existing sync logic
+                variant = template.product_variant_ids[0]
+                if not self.env.context.get('sync_from_variant'):
+                    update_vals = {}
+                    if 'list_price' in vals and template.list_price != variant.list_price:
+                        update_vals['list_price'] = template.list_price
+                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
+                        update_vals['binding_type'] = template.binding_type.id
+                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
+                        update_vals['publication_date'] = template.publication_date
+                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
+                        update_vals['last_edition'] = template.last_edition
+                    if 'pages' in vals and template.pages != variant.pages:
+                        update_vals['pages'] = template.pages
+                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
+                        update_vals['paper_gsm'] = template.paper_gsm
+                    if 'height' in vals and template.height != variant.height:
+                        update_vals['height'] = template.height
+                    if 'width' in vals and template.width != variant.width:
+                        update_vals['width'] = template.width
+                    if 'weight' in vals and template.weight != variant.weight:
+                        update_vals['weight'] = template.weight
+                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
+                        update_vals['description_ecommerce'] = template.description_ecommerce
+                    if 'length' in vals and template.length != variant.length:
+                        update_vals['length'] = template.length
 
-        # NEW: sync ecommerce categories only when authors/publishers changed
+                    if update_vals:
+                        variant.with_context(sync_from_template=True).write(update_vals)
+
+        # Sync ecommerce categories only when authors/publishers changed
         if ('author_ids' in vals or 'publisher_ids' in vals) and \
                 not self.env.context.get('skip_categ_sync'):
             self._sync_public_categories_from_partners()
