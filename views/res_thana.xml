@@ -13,22 +13,54 @@
                             </group>
                             <group>
                                 <field name="state_id"/>
-                                <field name="country_id"/>
                             </group>
                         </group>
                     </sheet>
                 </form>
             </field>
         </record>
+        <record id="view_res_partner_kanban_inherit_thana" model="ir.ui.view">
+            <field name="name">res.partner.kanban.thana</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//kanban" position="inside">
+                    <field name="thana_id"/>
+                    <field name="state_id"/>
+                </xpath>
+
+                <xpath expr="//div[hasclass('mb-1')]/following-sibling::div[1]/field[@name='city']" position="after">
+                    <t t-if="record.thana_id.raw_value">
+                        <span t-if="record.city.raw_value">, </span>
+                        <t t-esc="record.thana_id.value.split('(')[0].trim()"/>,
+                        <t t-esc="record.state_id.value.split('(')[0].trim()"/>
+                    </t>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_partner_form_inherit_thana" model="ir.ui.view">
+            <field name="name">res.partner.form.thana</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='city']" position="after">
+                    <field name="thana_id" placeholder="Thana" domain="[('state_id', '=', state_id)]" options="{'no_create': True}"/>
+                </xpath>
+            </field>
+        </record>
+
+
+
+
         <record id="book_shop_res_thana_tree_view" model="ir.ui.view">
-            <field name="name">book.shop.res.thana.tree.view</field>
+            <field name="name">book.shop.res.thana.tree</field>
             <field name="model">res.thana</field>
             <field name="arch" type="xml">
                 <list>
                     <field name="name"/>
 <!--                    <field name="code"/>-->
                     <field name="state_id"/>
-                    <field name="country_id"/>
                 </list>
             </field>
         </record>
