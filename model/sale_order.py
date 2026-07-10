@@ -26,6 +26,7 @@ from odoo import fields, models, api, _
 
 class SaleOrder(models.Model):
     _inherit='sale.order'
+    report_grids = fields.Boolean(string="Print Variant Grids", default=False)
 
     partner_balance=fields.Monetary("Partner Balance",related="partner_id.commercial_partner_id.total_balance")
     delivery_address=fields.Text(string="Delivery Address", compute="_compute_shipping_address", store=True)
