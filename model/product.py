@@ -155,13 +155,24 @@ class ProductTemplate(models.Model):
     def create(self, vals):
         res = super().create(vals)
 
-        # Existing variant sync logic
-        product = self.env['product.product'].search([('product_tmpl_id', '=', res.id)])
-        sync_dict = {}
-        for key in vals:
-            if isinstance(key, str) and key in product._fields:
-                sync_dict[key] = vals[key]
-        product.write(sync_dict)
+        # Existing variant sync logic - only meaningful, and only safe,
+        # when the template has exactly ONE variant (same guard already
+        # used below in write() and in ProductProduct.write()). Writing
+        # shared template-level fields (name, type, uom_id, ...) onto
+        # EVERY variant of a multi-variant product (e.g. one with Size
+        # attribute lines, like S/L products) doesn't make sense - the
+        # whole point of variants is that they differ - and doing it via
+        # a bulk write() on the freshly-created recordset can race with
+        # Odoo's own variant computation and raise MissingError on the
+        # very products being written.
+        if len(res.product_variant_ids) == 1:
+            product = res.product_variant_id
+            sync_dict = {}
+            for key in vals:
+                if isinstance(key, str) and key in product._fields:
+                    sync_dict[key] = vals[key]
+            if sync_dict:
+                product.with_context(sync_from_template=True).write(sync_dict)
 
         # NEW: sync ecommerce categories after record has an ID
         res._sync_public_categories_from_partners()
