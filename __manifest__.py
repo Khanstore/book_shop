@@ -11,7 +11,7 @@ This is the base module for import and export of invoices in various EDI formats
 the transmission of said documents to various parties involved in the exchange (other company,
 governements, etc.)
     """,
-    'version': '18.0.1.0.0',
+    'version': '18.0.1.0.1',
     'category': 'Others',
     'depends' : ['base','website_sale','website','stock','product','account_followup','accountant','account','purchase','point_of_sale'],
     'author': 'SM Ashraf',

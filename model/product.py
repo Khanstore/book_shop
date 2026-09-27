@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ###################################################################################
 #
-#    Eagle ERP  Ltd.
+#    Eagle ERP Ltd.
 #    Copyright (C) 2021 Eagle ERP Ltd(<http://www.eagle_it_solutions.com>).
 #    Author: SM Ashraf
 #
@@ -19,17 +19,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ###################################################################################
-import urllib
 import base64
+import urllib
 
-# from pygments.lexer import default
-
-from odoo import fields, models, api, _
+from odoo import _, api, fields, models
 from odoo.osv import expression
 from odoo.tools.translate import html_translate
 
 
-# In your Python file
 class ProductPen(models.Model):
     _name = 'product.pen'
     _inherits = {'product.template': 'product_tmpl_id'}
@@ -37,42 +34,50 @@ class ProductPen(models.Model):
     product_tmpl_id = fields.Many2one('product.template', required=True, ondelete='cascade')
     ink_color = fields.Char('Ink Color')
     product_color = fields.Char('Product Color')
-    tip_size=fields.Char('Tip Size')
-    design=fields.Char('Design')
-    tip_type=fields.Char('Tip Type')
-    use_type=fields.Char('Use Type')
-    material_type=fields.Char('Material Type')
-    writing_experience=fields.Char('Writing Experience')
-    feature=fields.Char('Feature')
-
+    tip_size = fields.Char('Tip Size')
+    design = fields.Char('Design')
+    tip_type = fields.Char('Tip Type')
+    use_type = fields.Char('Use Type')
+    material_type = fields.Char('Material Type')
+    writing_experience = fields.Char('Writing Experience')
+    feature = fields.Char('Feature')
 
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
-    printed_name=fields.Char('Name')
+
+    printed_name = fields.Char('Name')
     is_book = fields.Boolean(
         "Is A Book",
         compute='_compute_is_book',
-        store=True,  # store=True so it works in domains/filters too
+        store=True,
     )
     isbn = fields.Char(string="ISBN")
-    author_ids = fields.Many2many(comodel_name="res.partner", relation='author_book_rel',column1='author_of',column2="author_ids", string="Author")
-    publisher_ids = fields.Many2many(comodel_name="res.partner",relation='publisher_book_rel',column1='publisher_of',column2='publisher_ids',string="Publisher")
-    # todo add translatro colum
-    # "res.partner",'publisher_book_rel','published_books','publisher_ids',string="Publisher"
+    author_ids = fields.Many2many(
+        comodel_name="res.partner",
+        relation='author_book_rel',
+        column1='author_of',
+        column2="author_ids",
+        string="Author"
+    )
+    publisher_ids = fields.Many2many(
+        comodel_name="res.partner",
+        relation='publisher_book_rel',
+        column1='publisher_of',
+        column2='publisher_ids',
+        string="Publisher"
+    )
     publication_date = fields.Char(string="Publication Date")
-    last_edition=fields.Char(string="Last Edition")
+    last_edition = fields.Char(string="Last Edition")
     genre = fields.Many2one('product.genre', string="Genre")
-    binding_type=fields.Many2one("book.binding.type")
+    binding_type = fields.Many2one("book.binding.type")
     pages = fields.Integer(string="Page")
     paper_gsm = fields.Integer("GSM")
     paper_color = fields.Many2one("book.paper.color", string="Colour")
     paper_quality = fields.Many2one("paper.quality", string="Paper Quality")
-    length=fields.Float("lenght")
-    height=fields.Float("Height")
-    width=fields.Float("Width")
-
-    # @api.onchange('categ_id')
+    length = fields.Float("lenght")
+    height = fields.Float("Height")
+    width = fields.Float("Width")
 
     @api.depends('categ_id', 'categ_id.parent_id', 'categ_id.complete_name')
     def _compute_is_book(self):
@@ -80,15 +85,10 @@ class ProductTemplate(models.Model):
             category = rec.categ_id
             rec.is_book = False
             while category:
-                # fixme correction of external id
-                if category.get_external_id()[category.id] == 'book_shop.product_category_book':
+                if category.get_external_id().get(category.id) == 'book_shop.product_category_book':
                     rec.is_book = True
-                    return
-                else:
-                    if category.parent_id.id:
-                        category = category.parent_id
-                    else:
-                        category = False
+                    break
+                category = category.parent_id if category.parent_id else False
 
     @api.onchange('author_ids')
     def writer_ids_onchange(self):
@@ -98,7 +98,8 @@ class ProductTemplate(models.Model):
                 self.public_categ_ids = [(3, rec._origin.id)]
         for line in self.author_ids:
             new_ecom_categ = self.env['product.public.category'].search(
-                [('related_writer_id', '=', line._origin.id)])
+                [('related_writer_id', '=', line._origin.id)]
+            )
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
     @api.onchange('publisher_ids')
@@ -109,7 +110,8 @@ class ProductTemplate(models.Model):
                 self.public_categ_ids = [(3, rec._origin.id)]
         for line in self.publisher_ids:
             new_ecom_categ = self.env['product.public.category'].search(
-                [('related_publisher_id', '=', line._origin.id)])
+                [('related_publisher_id', '=', line._origin.id)]
+            )
             self.public_categ_ids = [(4, new_ecom_categ.id)]
 
     def _sync_public_categories_from_partners(self):
@@ -117,7 +119,6 @@ class ProductTemplate(models.Model):
         PublicCategory = self.env['product.public.category']
 
         for template in self:
-            # Collect current writer/publisher-linked categories
             current_writer_categs = template.public_categ_ids.filtered(
                 lambda c: c.related_writer_id
             )
@@ -125,17 +126,13 @@ class ProductTemplate(models.Model):
                 lambda c: c.related_publisher_id
             )
 
-            # Build expected categories from current author_ids
             expected_writer_categs = PublicCategory.search([
                 ('related_writer_id', 'in', template.author_ids.ids)
             ])
-
-            # Build expected categories from current publisher_ids
             expected_publisher_categs = PublicCategory.search([
                 ('related_publisher_id', 'in', template.publisher_ids.ids)
             ])
 
-            # Compute what to add and remove
             to_add = (expected_writer_categs - current_writer_categs) | \
                      (expected_publisher_categs - current_publisher_categs)
             to_remove = (current_writer_categs - expected_writer_categs) | \
@@ -148,23 +145,10 @@ class ProductTemplate(models.Model):
                     {'public_categ_ids': commands}
                 )
 
-    # -----------------------------------------------
-    # Update your existing create() override
-    # -----------------------------------------------
-
     def create(self, vals):
         res = super().create(vals)
 
-        # Existing variant sync logic - only meaningful, and only safe,
-        # when the template has exactly ONE variant (same guard already
-        # used below in write() and in ProductProduct.write()). Writing
-        # shared template-level fields (name, type, uom_id, ...) onto
-        # EVERY variant of a multi-variant product (e.g. one with Size
-        # attribute lines, like S/L products) doesn't make sense - the
-        # whole point of variants is that they differ - and doing it via
-        # a bulk write() on the freshly-created recordset can race with
-        # Odoo's own variant computation and raise MissingError on the
-        # very products being written.
+        # Ensure single variant updates pass context to bypass stock valuation triggers
         if len(res.product_variant_ids) == 1:
             product = res.product_variant_id
             sync_dict = {}
@@ -172,86 +156,59 @@ class ProductTemplate(models.Model):
                 if isinstance(key, str) and key in product._fields:
                     sync_dict[key] = vals[key]
             if sync_dict:
-                product.with_context(sync_from_template=True).write(sync_dict)
+                product.with_context(
+                    sync_from_template=True,
+                    disable_auto_svl=True
+                ).write(sync_dict)
 
-        # NEW: sync ecommerce categories after record has an ID
         res._sync_public_categories_from_partners()
-
         return res
-
-    # -----------------------------------------------
-    # Update your existing write() override
-    # -----------------------------------------------
 
     def write(self, vals):
         res = super().write(vals)
 
-        # Template -> variant sync logic (only when there's a single variant)
-        for template in self:
-            if len(template.product_variant_ids) == 1:
-                variant = template.product_variant_ids[0]
-                if not self.env.context.get('sync_from_variant'):
+        # Skip sync if this write was initiated from variant to avoid recursion loops
+        if not self.env.context.get('sync_from_variant'):
+            for template in self:
+                if len(template.product_variant_ids) == 1:
+                    variant = template.product_variant_ids[0]
                     update_vals = {}
-                    if 'list_price' in vals and template.list_price != variant.list_price:
-                        update_vals['list_price'] = template.list_price
-                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
-                        update_vals['binding_type'] = template.binding_type.id
-                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
-                        update_vals['publication_date'] = template.publication_date
-                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
-                        update_vals['last_edition'] = template.last_edition
-                    if 'pages' in vals and template.pages != variant.pages:
-                        update_vals['pages'] = template.pages
-                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
-                        update_vals['paper_gsm'] = template.paper_gsm
-                    if 'height' in vals and template.height != variant.height:
-                        update_vals['height'] = template.height
-                    if 'width' in vals and template.width != variant.width:
-                        update_vals['width'] = template.width
-                    if 'weight' in vals and template.weight != variant.weight:
-                        update_vals['weight'] = template.weight
-                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
-                        update_vals['description_ecommerce'] = template.description_ecommerce
-                    if 'length' in vals and template.length != variant.length:
-                        update_vals['length'] = template.length
+
+                    fields_to_sync = [
+                        'list_price', 'binding_type', 'publication_date', 'last_edition',
+                        'pages', 'paper_gsm', 'height', 'width', 'weight',
+                        'description_ecommerce', 'length'
+                    ]
+
+                    for field in fields_to_sync:
+                        if field in vals:
+                            val = getattr(template, field)
+                            var_val = getattr(variant, field)
+
+                            # Handle relational fields
+                            if hasattr(val, 'id'):
+                                val = val.id
+                            if hasattr(var_val, 'id'):
+                                var_val = var_val.id
+
+                            if val != var_val:
+                                update_vals[field] = val
 
                     if update_vals:
-                        variant.with_context(sync_from_template=True).write(update_vals)
+                        variant.with_context(
+                            sync_from_template=True,
+                            disable_auto_svl=True
+                        ).write(update_vals)
 
-        # Sync ecommerce categories only when authors/publishers changed
         if ('author_ids' in vals or 'publisher_ids' in vals) and \
                 not self.env.context.get('skip_categ_sync'):
             self._sync_public_categories_from_partners()
 
         return res
 
-    # @api.model
-    # def name_search(self, name, args=None, operator='ilike', limit=100):
-    #     args = args or []
-    #     search_domain = [('name', operator, name)]  # Default search in the current language
-    #
-    #     # Get all active languages
-    #     active_langs = self.env['res.lang'].search([('active', '=', True)])
-    #     product_ids = set()
-    #
-    #     # Search product names in all active languages
-    #     for lang in active_langs:
-    #         translated_products = self.with_context(lang=lang.code).search([('name', operator, name)], limit=limit)
-    #         product_ids.update(translated_products.ids)
-    #
-    #     # Add translated product IDs to the search domain
-    #     if product_ids:
-    #         search_domain = ['|'] + search_domain + [('id', 'in', list(product_ids))]
-    #
-    #     # Search for products
-    #     products = self.search(search_domain + args, limit=limit)
-    #
-    #     # Return product names manually
-    #     return [(prod.id, prod.name) for prod in products]  # Odoo 18 workaround
-
 
 class ProductProduct(models.Model):
-    _inherit= 'product.product'
+    _inherit = 'product.product'
 
     list_price = fields.Float(
         'Sales Price', default=1.0,
@@ -270,134 +227,57 @@ class ProductProduct(models.Model):
     width = fields.Float("Width")
     weight = fields.Float("Weight")
     description_ecommerce = fields.Html(
-            string="eCommerce Description",
-            translate=html_translate,
-            sanitize_overridable=True,
-            sanitize_attributes=False,
-            sanitize_form=False,
-        )
-    # set variant fields with same value while only one variant
+        string="eCommerce Description",
+        translate=html_translate,
+        sanitize_overridable=True,
+        sanitize_attributes=False,
+        sanitize_form=False,
+    )
+
     def write(self, vals):
         res = super().write(vals)
-        for variant in self:
-            template = variant.product_tmpl_id
-            if len(template.product_variant_ids) == 1:
-                if not self.env.context.get('sync_from_template'):
+
+        # Skip sync if write was initiated from template
+        if not self.env.context.get('sync_from_template'):
+            for variant in self:
+                template = variant.product_tmpl_id
+                if len(template.product_variant_ids) == 1:
                     update_vals = {}
-                    if 'list_price' in vals and template.list_price != variant.list_price:
-                        update_vals['list_price'] = variant.list_price
-                    if 'binding_type' in vals and template.binding_type != variant.binding_type:
-                        update_vals['binding_type'] = variant.binding_type.id
-                    if 'publication_date' in vals and template.publication_date != variant.publication_date:
-                        update_vals['publication_date'] = variant.publication_date
-                    if 'last_edition' in vals and template.last_edition != variant.last_edition:
-                        update_vals['last_edition'] = variant.last_edition
-                    if 'pages' in vals and template.pages != variant.pages:
-                        update_vals['pages'] = variant.pages
-                    if 'paper_gsm' in vals and template.paper_gsm != variant.paper_gsm:
-                        update_vals['paper_gsm'] = variant.paper_gsm
-                    if 'length' in vals and template.length != variant.length:
-                        update_vals['length'] = variant.length
-                    if 'height' in vals and template.height != variant.height:
-                        update_vals['height'] = variant.height
-                    if 'width' in vals and template.width != variant.width:
-                        update_vals['width'] = variant.width
-                    if 'weight' in vals and template.weight != variant.weight:
-                        update_vals['weight'] = variant.weight
-                    if 'description_ecommerce' in vals and template.description_ecommerce != variant.description_ecommerce:
-                        update_vals['description_ecommerce'] = variant.description_ecommerce
+
+                    fields_to_sync = [
+                        'list_price', 'binding_type', 'publication_date', 'last_edition',
+                        'pages', 'paper_gsm', 'height', 'width', 'weight',
+                        'description_ecommerce', 'length'
+                    ]
+
+                    for field in fields_to_sync:
+                        if field in vals:
+                            val = getattr(variant, field)
+                            tmpl_val = getattr(template, field)
+
+                            # Handle relational fields
+                            if hasattr(val, 'id'):
+                                val = val.id
+                            if hasattr(tmpl_val, 'id'):
+                                tmpl_val = tmpl_val.id
+
+                            if val != tmpl_val:
+                                update_vals[field] = val
+
                     if update_vals:
-                        template.with_context(sync_from_variant=True).write(update_vals)
+                        template.with_context(
+                            sync_from_variant=True,
+                            disable_auto_svl=True
+                        ).write(update_vals)
         return res
-
-
-    # @api.model
-    # def name_search(self, name='', args=None, operator='ilike', limit=100):
-    #     # multi langual search is working
-    #     user_lang = self.env.context.get('lang', 'en_US')
-    #     domain = args or []
-    #     positive_operators = ['=', 'ilike', '=ilike', 'like', '=like']
-    #     is_positive = operator not in expression.NEGATIVE_TERM_OPERATORS
-    #     matched_ids = set()
-    #
-    #     # Search in all active languages
-    #     active_langs = self.env['res.lang'].search([('active', '=', True)]).mapped('code')
-    #
-    #     for lang_code in active_langs:
-    #         env_lang = self.with_context(lang=lang_code)
-    #
-    #         # Try exact code/barcode matches first (fast lookup)
-    #         products = env_lang.search(expression.AND([domain, [('default_code', '=', name)]]), limit=limit)
-    #         products |= env_lang.search(expression.AND([domain, [('barcode', '=', name)]]), limit=limit)
-    #
-    #         if not products and is_positive:
-    #             products = env_lang.search(expression.AND([domain, [('default_code', operator, name)]]),
-    #                                        limit=limit)
-    #             limit_rest = limit and limit - len(products)
-    #             if limit_rest is None or limit_rest > 0:
-    #                 products |= env_lang.search(
-    #                     expression.AND([
-    #                         domain,
-    #                         [('id', 'not in', list(matched_ids)), ('name', operator, name)]
-    #                     ]), limit=limit_rest
-    #                 )
-    #         elif not products and not is_positive:
-    #             products = env_lang.search(
-    #                 expression.AND([
-    #                     domain,
-    #                     [('name', operator, name), '|', ('default_code', operator, name),
-    #                      ('default_code', '=', False)]
-    #                 ]), limit=limit
-    #             )
-    #
-    #         matched_ids.update(products.ids)
-    #
-    #         # Stop early if limit is reached
-    #         if limit and len(matched_ids) >= limit:
-    #             break
-    #
-    #     # Final result in user's language
-    #     final_products = self.browse(list(matched_ids)).with_context(lang=user_lang)
-    #     return [(product.id, product.display_name) for product in final_products.sudo()]
 
 
 class ProductGenre(models.Model):
     _name = 'product.genre'
     _description = 'Book Genre'
-    name = fields.Char(string="Genre", required=True ,translate=True)
-    description = fields.Char(string="Description", required=True,translate=True)
+    name = fields.Char(string="Genre", required=True, translate=True)
+    description = fields.Char(string="Description", required=True, translate=True)
 
-# class ProductPublicCategory(models.Model):
-#     _inherit='product.public.category'
-#     _description='this modules adds product public categories for writer and publishers'
-#     is_published=fields.Boolean("Is Published")
-#     related_writer_id=fields.Many2one('res.partner',"Writer")
-#     related_publisher_id=fields.Many2one('res.partner',"Publisher")
-
-# class PaperQuality(models.Model):
-#     _name = 'paper.type'
-#     _description = 'Type Of Paper'
-#     name = fields.Char("Paper Type",compute='get_paper_name')
-#     gsm= fields.Integer("GSM")
-#     paper_quality=fields.Many2one ("paper.quality","Paper quality")
-#     paper_color= fields.Many2one("book.paper.color",string="colour")
-#     description = fields.Char("description")
-#
-#     @api.onchange('gsm','paper_type','color')
-#     def get_paper_name(self):
-#         for rec in self:
-#             paper=""
-#             if rec.gsm:
-#                 paper=str(rec.gsm) + " gram "
-#
-#             if rec.paper_color :
-#                 paper=paper +rec.paper_color.name +" "
-#             if rec.paper_quality :
-#                 paper=paper +rec.paper_quality.name +" "
-#             if rec.description :
-#                 paper=paper +"("+ rec.description+")"
-#             rec.name=paper
-#
 
 class PaperColor(models.Model):
     _name = 'book.paper.color'
@@ -405,32 +285,32 @@ class PaperColor(models.Model):
     name = fields.Char("Paper Color")
     description = fields.Char("description")
 
+
 class PaperType(models.Model):
     _name = 'paper.quality'
     _description = 'Quality Of Paper'
     name = fields.Char("Paper Quality")
     description = fields.Char("description")
 
+
 class BookBindingType(models.Model):
     _name = 'book.binding.type'
     _description = 'Type Of Available Binding'
-    name= fields.Char("Binding Type")
-    description=fields.Char("description")
-    image=fields.Binary("Image", help='Image for binding Type.')
+    name = fields.Char("Binding Type")
+    description = fields.Char("description")
+    image = fields.Binary("Image", help='Image for binding Type.')
+
 
 class ProductPublicCategory(models.Model):
-    _inherit='product.public.category'
-    _description='this modules adds product public categories for writer and publishers'
+    _inherit = 'product.public.category'
+    _description = 'this modules adds product public categories for writer and publishers'
     is_published = fields.Boolean("Is Published", default=False)
-    product_tmpl_count=fields.Integer(string="Product Count",compute="get_product_tmpl_count",store=True)
-    related_writer_id=fields.Many2one('res.partner',"Writer")
-    related_publisher_id=fields.Many2one('res.partner',"Publisher")
+    product_tmpl_count = fields.Integer(string="Product Count", compute="get_product_tmpl_count", store=True)
+    related_writer_id = fields.Many2one('res.partner', "Writer")
+    related_publisher_id = fields.Many2one('res.partner', "Publisher")
 
     def get_product_tmpl_count(self):
         for rec in self:
-            rec.product_tmpl_count=self.env['product.template'].search_count([
-                ('public_categ_ids', 'in', rec.id)])
-
-
-
-
+            rec.product_tmpl_count = self.env['product.template'].search_count([
+                ('public_categ_ids', 'in', rec.id)
+            ])
