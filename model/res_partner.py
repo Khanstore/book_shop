@@ -117,34 +117,96 @@ class Partner(models.Model):
                 rec.mobile_search = self.normalize_bangladesh_phone(rec.mobile)
                 
     @api.model
-    def name_search(self, name='', args=None, operator='ilike', limit=100, name_get_uid=None):
-        args = args or []
-        recs = self.env['res.partner']
-        domain = args[:]
-        # used token to search for each word separately
-        if name:
+    class ResPartner(models.Model):
+        _inherit = "res.partner"
+
+        @api.model
+        def name_search(
+                self,
+                name="",
+                args=None,
+                operator="ilike",
+                limit=100,
+        ):
+            args = args or []
+
+            # IMPORTANT:
+            # Let Odoo and other installed modules participate in
+            # the standard res.partner search.
+            result = super().name_search(
+                name=name,
+                args=args,
+                operator=operator,
+                limit=limit,
+            )
+
+            if not name:
+                return result
+
             name = name.strip()
+
+            if not name:
+                return result
+
+            # ---------------------------------------------------------
+            # Existing Book Shop behavior:
+            # Search partner name by individual words.
+            # ---------------------------------------------------------
             name_tokens = name.lower().split()
 
-            # Search for name matches with all tokens (out-of-order)
-            token_domain = [('name', 'ilike', token) for token in name_tokens]
-            domain += ['&'] * (len(token_domain) - 1) + token_domain
+            token_domain = [
+                ("name", "ilike", token)
+                for token in name_tokens
+            ]
 
-            name_matches = self.search(domain, limit=limit)
-            recs |= name_matches
+            if token_domain:
+                if len(token_domain) > 1:
+                    token_domain = (
+                            ["&"] * (len(token_domain) - 1)
+                            + token_domain
+                    )
 
-            # If input contains digits, search for phone numbers too
-            if re.search(r'\d', name):
+                name_matches = self.search(
+                    token_domain + args,
+                    limit=limit,
+                )
+
+                existing_ids = {
+                    record_id
+                    for record_id, display_name in result
+                }
+
+                for record in name_matches:
+                    if record.id not in existing_ids:
+                        result.append(
+                            (record.id, record.display_name)
+                        )
+                        existing_ids.add(record.id)
+
+            # ---------------------------------------------------------
+            # Existing Book Shop behavior:
+            # Search normalized phone/mobile.
+            # ---------------------------------------------------------
+            if re.search(r"\d", name):
                 normalized = self._normalize_phone(name)
-                phone_matches = self.search([
-                    '|',
-                    ('phone_search', 'ilike', normalized),
-                    ('mobile_search', 'ilike', normalized)
-                ] + args, limit=limit)
-                recs |= phone_matches
 
-        return recs.name_get()
+                phone_matches = self.search(
+                    [
+                        "|",
+                        ("phone_search", "ilike", normalized),
+                        ("mobile_search", "ilike", normalized),
+                    ] + args,
+                    limit=limit,
+                )
 
+                for record in phone_matches:
+                    if record.id not in existing_ids:
+                        result.append(
+                            (record.id, record.display_name)
+                        )
+                        existing_ids.add(record.id)
+
+            return result[:limit] if limit else result
 
 
      # def name_search(self, name='', args=None, operator='ilike', limit=100):
